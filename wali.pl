@@ -8,4 +8,5 @@ play :-
     repeat,
     display_start_menu,
     read_until_between(0,4,Option),
-    write(Option).
+    initial_state(InitialBoard,WhitePieces,BlackPieces,Turn,Phase),
+    display_game(InitialBoard,WhitePieces,BlackPieces,Turn,Phase).
