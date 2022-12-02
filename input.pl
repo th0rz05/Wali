@@ -11,7 +11,9 @@ read_number(X) :- read_number_acc(0, X),
                   get_code(10).
 
 read_until_between(Min, Max, Value) :- repeat,
-                                       print_string("Choose an option[0-4] :"),
+                                       print_string("Choose an option["),
+                                       write(Min-Max),
+                                       print_string("] :"),
                                        read_number(Value),
                                        Value >= Min,
                                        Value =< Max,

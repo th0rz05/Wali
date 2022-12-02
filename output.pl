@@ -74,9 +74,6 @@ print_double_banner(Text1,WhitePieces, Text2,BlackPieces, Symbol, Padding) :- Pa
                                        print_banner_edge_pieces(Text1,WhitePieces,Symbol, Padding),print_banner_edge_pieces(Text2,BlackPieces,Symbol, Padding),nl.
 
 
-
-
-
 display_start_menu :-
     nl,
     write('   *************************************************************************************   '),nl,
@@ -101,8 +98,7 @@ display_start_menu :-
     write('   |                                                                                   |   '),nl,
     write('   |                               1 - PLAYER VS PLAYER                                |   '),nl,
     write('   |                               2 - PLAYER VS COMPUTER                              |   '),nl,
-    write('   |                               3 - COMPUTER VS PLAYER                              |   '),nl,
-    write('   |                               4 - COMPUTER VS COMPUTER                            |   '),nl,
+    write('   |                               3 - COMPUTER VS COMPUTER                            |   '),nl,
     write('   |                               0 - EXIT                                            |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   *************************************************************************************   '),nl,nl.
