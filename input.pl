@@ -1,8 +1,3 @@
-print_string([]).
-print_string([Code | T]) :- char_code(Char, Code),
-                            write(Char),
-                            print_string(T).
-
 read_number_acc(X, X) :- peek_code(10), !.
 read_number_acc(Acc, X) :- \+ peek_code(10),
                            get_code(Code),
