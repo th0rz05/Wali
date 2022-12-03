@@ -13,7 +13,7 @@ read_number(X) :- read_number_acc(0, X),
 read_until_between(Min, Max, Value) :- repeat,
                                        print_string("Choose an option["),
                                        write(Min-Max),
-                                       print_string("] :"),
+                                       print_string("] : "),
                                        read_number(Value),
                                        Value >= Min,
                                        Value =< Max,
@@ -24,3 +24,5 @@ read_string("") :- peek_code(10),
                    get_code(_).
 read_string([Char | T]) :- get_code(Char),
                            read_string(T).
+
+read_move(X,Y) :- print_string("Choose a valid move: "),read_string(Move),length(Move,2),parse_move(Move,X,Y).

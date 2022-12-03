@@ -14,14 +14,14 @@ play :-
 play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,Turn,Move),
-                                                    nl,nl,print_string(Move),nl,nl,
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,Turn,MoveX,MoveY),
+                                                    nl,nl,write(MoveX),write(MoveY),nl,nl,
                                                     switch_turns(Turn,NewTurn),
                                                     display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
                                                     game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
 
-choose_move(Board,Pieces,Turn,Move) :- Pieces>0,
-                                read_string(Move).
+choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
+                                read_move(MoveX,MoveY),validate_move(MoveX,MoveY),!.
 
 
 switch_turns(whiteturn,blackturn).
