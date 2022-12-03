@@ -23,7 +23,7 @@ game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePiece
 choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
                                 read_move(MoveX,MoveY),validate_move(MoveX,MoveY),!.
 
-valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %6-1 e 5-1 pq index 0
+valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %5-1 e 6-1 pq index 0
 
 
 valid_moves(Board,Turn,-1,Y,[]).
@@ -40,7 +40,7 @@ valid_moves_line(Board,Turn,X,Y,MovesLine) :- validate_move(X,Y),
                                     append(NewMovesLine,[X-Y],MovesLine).
 
 
-validate_move(X,Y) :- X >= 0, X < 5, Y >= 0, Y < 6.
+validate_move(X,Y) :- X >= 0, X < 5, Y >= 0, Y < 6. %desenvolver um not_ocuppied(Board,X,Y) e no_neighbours(Board,X,Y,Turn) para ver se nao tem nenhum vizinho igual
 
 
 move([Line|Rest],0,Y,[NewLine|Rest],whiteturn) :- replace(Line,Y,_O,1,NewLine).
