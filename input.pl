@@ -18,3 +18,9 @@ read_until_between(Min, Max, Value) :- repeat,
                                        Value >= Min,
                                        Value =< Max,
                                        !.
+
+read_string("") :- peek_code(10),
+                   !,
+                   get_code(_).
+read_string([Char | T]) :- get_code(Char),
+                           read_string(T).

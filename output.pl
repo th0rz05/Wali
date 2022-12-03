@@ -148,9 +148,9 @@ display_line([H | T]) :-
     display_line(T).
                                                                            
                                                                              
-display_turn(0) :- print_banner("White's turn",*, 7),nl,nl.
+display_turn(whiteturn) :- print_banner("White's turn",*, 7),nl,nl.
 
-display_turn(1) :- print_banner("Black's turn",*, 7),nl,nl.                                                                             
+display_turn(blackturn) :- print_banner("Black's turn",*, 7),nl,nl.                                                                             
                                                                              
                                                                              
                                                                              
