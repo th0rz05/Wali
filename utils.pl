@@ -10,6 +10,13 @@ display_piece(1) :- put_code(9312).
 
 display_piece(2) :- put_code(10103).
 
-validate_move(X,Y) :- X >= 0, X < 6, Y >= 0, Y < 5.
+switch_turns(whiteturn,blackturn).
+switch_turns(blackturn,whiteturn).
 
-parse_move([L|[N|[]]],X,Y) :- X is L-97 , Y is N-49.
+parse_move([L|[N|[]]],X,Y) :- Y is L-97 , X is N-49.
+
+replace([H1|T1], 0, H1, N, [N|T1]).
+replace([H1|T1], X, O, N, L2) :- X > 0,
+                                X1 is X-1,
+                                replace(T1,X1,O,N,L3),
+                                L2 = [H1|L3].

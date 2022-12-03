@@ -23,24 +23,32 @@ game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePiece
 choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
                                 read_move(MoveX,MoveY),validate_move(MoveX,MoveY),!.
 
-
-switch_turns(whiteturn,blackturn).
-switch_turns(blackturn,whiteturn).
+valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %6-1 e 5-1 pq index 0
 
 
-replace([H1|T1], 0, H1, N, [N|T1]).
-replace([H1|T1], X, O, N, L2) :- X > 0,
-                                X1 is X-1,
-                                replace(T1,X1,O,N,L3),
-                                L2 = [H1|L3].
+valid_moves(Board,Turn,-1,Y,[]).
+valid_moves(Board,Turn,X,Y,Moves) :- valid_moves_line(Board,Turn,X,Y,NewMovesLine),
+                                    X1 is X-1,
+                                    valid_moves(Board,Turn,X1,Y,NewMoves),
+                                    append(NewMoves,NewMovesLine,Moves).
 
 
-move([Line|Rest],X,0,[NewLine|Rest],whiteturn) :- replace(Line,X,_O,1,NewLine).
+valid_moves_line(Board,Turn,X,-1,[]).
+valid_moves_line(Board,Turn,X,Y,MovesLine) :- validate_move(X,Y),
+                                    Y1 is Y-1,
+                                    valid_moves_line(Board,Turn,X,Y1,NewMovesLine),
+                                    append(NewMovesLine,[X-Y],MovesLine).
 
-move([Line|Rest],X,0,[NewLine|Rest],blackturn) :- replace(Line,X,_O,2,NewLine).
 
-move([Line|Rest],X,Y,NewBoard,Turn) :- Y1 is Y-1,
-                                        move(Rest,X,Y1,NB,Turn),
+validate_move(X,Y) :- X >= 0, X < 5, Y >= 0, Y < 6.
+
+
+move([Line|Rest],0,Y,[NewLine|Rest],whiteturn) :- replace(Line,Y,_O,1,NewLine).
+
+move([Line|Rest],0,Y,[NewLine|Rest],blackturn) :- replace(Line,Y,_O,2,NewLine).
+
+move([Line|Rest],X,Y,NewBoard,Turn) :- X1 is X-1,
+                                        move(Rest,X1,Y,NB,Turn),
                                         NewBoard =[Line|NB].
 
                                                 
