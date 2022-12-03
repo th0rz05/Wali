@@ -15,10 +15,10 @@ play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,Whit
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,Turn,MoveX,MoveY),
-                                                    nl,nl,write(MoveX),write(MoveY),nl,nl,
+                                                    move(Board,MoveX,MoveY,NewBoard,Turn),
                                                     switch_turns(Turn,NewTurn),
-                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
-                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
+                                                    display_game(NewBoard,WhitePieces,BlackPieces,NewTurn,1),
+                                                    game_cycle(NewBoard,WhitePieces,BlackPieces,NewTurn,1).
 
 choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
                                 read_move(MoveX,MoveY),validate_move(MoveX,MoveY),!.
@@ -26,6 +26,22 @@ choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
 
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
+
+
+replace([H1|T1], 0, H1, N, [N|T1]).
+replace([H1|T1], X, O, N, L2) :- X > 0,
+                                X1 is X-1,
+                                replace(T1,X1,O,N,L3),
+                                L2 = [H1|L3].
+
+
+move([Line|Rest],X,0,[NewLine|Rest],whiteturn) :- replace(Line,X,_O,1,NewLine).
+
+move([Line|Rest],X,0,[NewLine|Rest],blackturn) :- replace(Line,X,_O,2,NewLine).
+
+move([Line|Rest],X,Y,NewBoard,Turn) :- Y1 is Y-1,
+                                        move(Rest,X,Y1,NB,Turn),
+                                        NewBoard =[Line|NB].
 
                                                 
 
