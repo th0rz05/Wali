@@ -16,28 +16,45 @@ play :-
 play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,Turn,MoveX,MoveY),
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,1),
                                                     move(Board,MoveX,MoveY,NewBoard,Turn),
                                                     handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
                                                     switch_turns(Turn,NewTurn),
                                                     display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
                                                     game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1).
 
-choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
-                                read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,Turn),!.
+game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_piece(Board,X,Y,Turn),
+                                                    move(Board,X,Y,NewBoard,Turn),
+                                                    switch_turns(Turn,NewTurn),
+                                                    display_game(Board,WhitePieces,BlackPieces,Turn,2).
+                                                    game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,2).
 
-% valid_drops(Board,Turn,Drops) :- valid_drops(Board,Turn,4,5,Drops),write(Drops).
-% valid_drops(Board,Turn,-1,Y,[]).
-% valid_drops(Board,Turn,X,Y,Drops) :- valid_drops_line(Board,Turn,X,Y,NewDropsLline),
-%                                      X1 is X-1,
-%                                      valid_drops(Board,Turn,X1,Y,NewDrops),
-%                                      append(NewDrops,NewDropsLline,Drops).
+choose_move(Board,WhitePieces,BlackPieces,whiteturn,MoveX,MoveY,Phase) :- WhitePieces>0,repeat,
+                                read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,whiteturn),!.
 
-% valid_drops_line(Board,Turn,X,-1,[]).
-% valid_drops_line(Board,Turn,X,Y,DropsLine) :- validate_move(Board,X,Y,Turn),
-%                                             Y1 is Y-1,
-%                                             valid_drops_line(Board,Turn,X,Y1,NewDropsLine),
-%                                             append(NewDropsLine,[X-Y],DropsLine). 
+choose_move(Board,WhitePieces,BlackPieces,blackturn,MoveX,MoveY,Phase) :- BlackPieces>0,repeat,
+                                read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,blackturn),!.
+
+choose_move(Board,0,0,Turn,MoveX,MoveY,Phase) :- 
+    display_game(Board,3,3,Turn,2),
+    game_cycle(Board,3,3,Turn,2).
+
+% choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces =< 0, BlackPieces =< 0),
+%                                                     Turn == blackturn, switch_turns(Turn,Turn),
+%                                                     NewWhitePieces is (12 - WhitePieces),
+%                                                     NewBlackPieces is (12 - BlackPieces),
+%                                                     display_game(Board,WhitePieces,BlackPieces,Turn,2),
+%                                                     game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
+
+choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces > 0; BlackPieces > 0),
+                                                    print_banner("move passed",*,3),
+                                                    switch_turns(Turn,NewTurn),
+                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
+                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
+
+choose_piece(Board,X,Y,whiteturn) :- repeat,read_move(X,Y),nth0(X,Board,R1),nth0(Y,R1,R2),R2 == 1,!.
+
+check_valid_moves(Board,Turn) :- valid_moves(Board,Turn,Moves), length(Moves,l),l > 0. 
 
 valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %5-1 e 6-1 pq index 0
 
@@ -61,6 +78,19 @@ validate_move(Board,X,Y,Turn) :- X >= 0, X < 5, Y >= 0, Y < 6, not_occupied(Boar
 not_occupied(Board,X,Y) :- nth0(X,Board,R),
                            nth0(Y,R,R2),
                            R2 == 0.
+
+
+% no_neighbours(Board,X,Y,Rows,Cols,whiteturn) :-
+%     % find neighbours
+%     N is X - 1,
+%     (N > 0, (nth0(N,Board,R), nth0(Y,R,R2), (R2 =:= 0; R2 =:= 2), N is X - 1)),
+%     S is X + 1,
+%     (S < Rows, (nth0(S,Board,R), nth0(Y,R,R2), (R2 =:= 0; R2 =:= 2))),
+%     W is Y - 1,
+%     (W > 0, (nth0(X,Board,R), nth0(W,R,R2), (R2 =:= 0; R2 =:= 2))),
+%     E is Y + 1,
+%     (E < Cols, (nth0(X,Board,R), nth0(E,R,R2), (R2 =:= 0; R2 =:= 2))).
+
 
 %corners
 no_neighbours(Board,0,0,whiteturn) :- nth0(0,Board,R), nth0(1,R,R2), R2\=1, nth0(1,Board,R3), nth0(0,R3,R4), R4\=1.
