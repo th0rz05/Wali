@@ -36,6 +36,7 @@ choose_move(Board,WhitePieces,BlackPieces,blackturn,MoveX,MoveY,Phase) :- BlackP
                                 read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,blackturn),!.
 
 choose_move(Board,0,0,Turn,MoveX,MoveY,Phase) :- 
+    press_any_key_to_continue,
     display_game(Board,3,3,Turn,2),
     game_cycle(Board,3,3,Turn,2).
 

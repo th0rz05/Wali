@@ -2,7 +2,7 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],3,3,whiteturn,1).
+                [0,0,0,0,0,0]],2,2,whiteturn,1).
 
 display_piece(0) :- put_code(32).
 
@@ -20,3 +20,8 @@ replace([H1|T1], X, O, N, L2) :- X > 0,
                                 X1 is X-1,
                                 replace(T1,X1,O,N,L3),
                                 L2 = [H1|L3].
+
+press_any_key_to_continue :-
+    print_banner("PHASE 2 STARTING",*, 7),nl,nl,nl,
+    write('Press Enter to continue...'),
+    get_char(_).
