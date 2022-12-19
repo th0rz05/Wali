@@ -5,6 +5,7 @@
 :- [output].
 :- [input].
 :- use_module(library(lists)).
+:- use_module(library(between)).
 
 play :-
     repeat,
@@ -17,6 +18,7 @@ play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,Whit
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,1),
+                                                    valid_moves(Board,Turn,Moves),
                                                     move(Board,MoveX,MoveY,NewBoard,Turn),
                                                     handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
                                                     switch_turns(Turn,NewTurn),
@@ -57,29 +59,13 @@ choose_piece(Board,X,Y,whiteturn) :- repeat,read_move(X,Y),nth0(X,Board,R1),nth0
 
 check_valid_moves(Board,Turn) :- valid_moves(Board,Turn,Moves), length(Moves,l),l > 0. 
 
-valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %5-1 e 6-1 pq index 0
+valid_moves(Board,Turn,Moves):- findall(X-Y, validate_move(Board,X,Y,Turn), Moves),write(Moves).
 
-
-valid_moves(Board,Turn,-1,Y,[]).
-valid_moves(Board,Turn,X,Y,Moves) :- valid_moves_line(Board,Turn,X,Y,NewMovesLine),
-                                    X1 is X-1,
-                                    valid_moves(Board,Turn,X1,Y,NewMoves),
-                                    append(NewMoves,NewMovesLine,Moves).
-
-
-valid_moves_line(Board,Turn,X,-1,[]).
-valid_moves_line(Board,Turn,X,Y,MovesLine) :- validate_move(Board,X,Y,Turn),
-                                    Y1 is Y-1,
-                                    valid_moves_line(Board,Turn,X,Y1,NewMovesLine),
-                                    append(NewMovesLine,[X-Y],MovesLine).
-
-
-validate_move(Board,X,Y,Turn) :- X >= 0, X < 5, Y >= 0, Y < 6, not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). %desenvolver um not_ocuppied(Board,X,Y) e no_neighbours(Board,X,Y,Turn) para ver se nao tem nenhum vizinho igual
+validate_move(Board,X,Y,Turn) :- between(0, 4, X),between(0, 5, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). %desenvolver um not_ocuppied(Board,X,Y) e no_neighbours(Board,X,Y,Turn) para ver se nao tem nenhum vizinho igual
 
 not_occupied(Board,X,Y) :- nth0(X,Board,R),
                            nth0(Y,R,R2),
                            R2 == 0.
-
 
 % no_neighbours(Board,X,Y,Rows,Cols,whiteturn) :-
 %     % find neighbours
