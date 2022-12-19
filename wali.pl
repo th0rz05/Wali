@@ -17,13 +17,22 @@ play :-
 play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
+play_game(2,_,_,_,_,_) :- print_banner("To be developed",*,3).
+
+play_game(3,_,_,_,_,_) :- print_banner("To be developed",*,3).
+
+play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
+
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,1),
-                                                    valid_moves(Board,Turn,Moves),
                                                     move(Board,MoveX,MoveY,NewBoard,Turn),
                                                     handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
                                                     switch_turns(Turn,NewTurn),
                                                     display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
                                                     game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1).
+
+game_cycle(Board,0,0,Turn,1) :-     press_any_key_to_continue,
+                                    display_game(Board,3,3,Turn,2),
+                                    game_cycle(Board,3,3,Turn,2).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_piece(Board,X,Y,Turn),
                                                     move(Board,X,Y,NewBoard,Turn),
@@ -37,23 +46,19 @@ choose_move(Board,WhitePieces,BlackPieces,whiteturn,MoveX,MoveY,Phase) :- WhiteP
 choose_move(Board,WhitePieces,BlackPieces,blackturn,MoveX,MoveY,Phase) :- BlackPieces>0,repeat,
                                 read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,blackturn),!.
 
-choose_move(Board,0,0,Turn,MoveX,MoveY,Phase) :- 
-    press_any_key_to_continue,
-    display_game(Board,3,3,Turn,2),
-    game_cycle(Board,3,3,Turn,2).
 
-% choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces =< 0, BlackPieces =< 0),
+%choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces =< 0, BlackPieces =< 0),
 %                                                     Turn == blackturn, switch_turns(Turn,Turn),
 %                                                     NewWhitePieces is (12 - WhitePieces),
 %                                                     NewBlackPieces is (12 - BlackPieces),
 %                                                     display_game(Board,WhitePieces,BlackPieces,Turn,2),
 %                                                     game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
 
-choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces > 0; BlackPieces > 0),
-                                                    print_banner("move passed",*,3),
-                                                    switch_turns(Turn,NewTurn),
-                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
-                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
+%choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces > 0; BlackPieces > 0),
+%                                                    print_banner("move passed",*,3),
+%                                                    switch_turns(Turn,NewTurn),
+%                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
+%                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
 
 choose_piece(Board,X,Y,whiteturn) :- repeat,read_move(X,Y),nth0(X,Board,R1),nth0(Y,R1,R2),R2 == 1,!.
 
@@ -113,8 +118,3 @@ move([Line|Rest],X,Y,NewBoard,Turn) :- X1 is X-1,
                                         NewBoard =[Line|NB].
 
 
-play_game(2) :- print_banner("To be developed",*,3).
-
-play_game(3) :- print_banner("To be developed",*,3).
-
-play_game(0) :- print_banner("Thank you for playing!",*,3).
