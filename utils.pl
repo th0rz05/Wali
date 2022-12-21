@@ -2,7 +2,7 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],1,1,whiteturn,1).
+                [0,0,0,0,0,0]],3,3,whiteturn,1).
 
 display_piece(0) :- put_code(32).
 
@@ -13,15 +13,65 @@ display_piece(2) :- put_code(10103).
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
 
-parse_move([L|[N|[]]],X,Y) :- Y is L-97 , X is N-49.
+parse_move([L|[N|[]]],X,Y) :- X is L-97 , Y is N-49.
 
-replace([H1|T1], 0, H1, N, [N|T1]).
-replace([H1|T1], X, O, N, L2) :- X > 0,
-                                X1 is X-1,
-                                replace(T1,X1,O,N,L3),
-                                L2 = [H1|L3].
+parse_move([L|[N|['u'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+                                             Y is N-49,
+                                             NewX is X,
+                                             NewY is Y -1.
+
+parse_move([L|[N|['d'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+                                             Y is N-49,
+                                             NewX is X,
+                                             NewY is Y + 1.
+
+parse_move([L|[N|['l'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+                                             Y is N-49,
+                                             NewX is X -1 ,
+                                             NewY is Y.
+
+parse_move([L|[N|['r'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+                                             Y is N-49,
+                                             NewX is X +1 ,
+                                             NewY is Y.
 
 press_any_key_to_continue :-
     print_banner("PHASE 2 STARTING",*, 7),nl,nl,nl,
     write('Press Enter to continue...'),
     get_char(_).
+
+
+replace(X, Y, Value, List, NewList) :-
+    nth0(Y, List, Row),
+    replace_in_list(X, Value, Row, NewRow),
+    replace_in_list(Y, NewRow, List, NewList).
+
+replace_in_list(_, _, [], []).
+replace_in_list(0, Value, [_|Tail], [Value|Tail]).
+replace_in_list(Index, Value, [Head|Tail], [Head|Result]) :-
+    Index > 0,
+    NewIndex is Index - 1,
+    replace_in_list(NewIndex, Value, Tail, Result).
+
+value_is(X, Y, Value, List) :-
+    nth0(Y, List, Row),
+    nth0(X, Row, Element),
+    Element =:= Value.
+
+neighbor(X, Y, Board, Value) :-
+   X > 0,
+   X1 is X - 1,
+   value_is(X1,Y,Value,Board).
+neighbor(X, Y, Board, Value) :-
+   X < 5,
+   X1 is X+1,
+   value_is(X1,Y,Value,Board).
+neighbor(X, Y, Board, Value) :-
+   Y > 0,
+   Y1 is Y - 1,
+   value_is(X,Y1,Value,Board).
+neighbor(X, Y, Board, Value) :-
+   Y < 4,
+   Y1 is Y + 1,
+   value_is(X,Y1,Value,Board).
+
