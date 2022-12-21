@@ -34,10 +34,12 @@ game_cycle(Board,0,0,Turn,1) :-     press_any_key_to_continue,
                                     display_game(Board,3,3,Turn,2),
                                     game_cycle(Board,3,3,Turn,2).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY),
+game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,X,Y,NewX,NewY),
+                                                    move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
                                                     switch_turns(Turn,NewTurn),
-                                                    display_game(Board,WhitePieces,BlackPieces,Turn,2).
+                                                    display_game(NewBoard,WhitePieces,BlackPieces,NewTurn,2),
                                                     game_cycle(NewBoard,WhitePieces,BlackPieces,NewTurn,2).
+
 
 place_piece(Board,WhitePieces,BlackPieces,whiteturn,MoveX,MoveY) :- WhitePieces>0,repeat,
                                 read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,whiteturn),!.
@@ -47,8 +49,7 @@ place_piece(Board,WhitePieces,BlackPieces,blackturn,MoveX,MoveY) :- BlackPieces>
 
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY) :- repeat,
                                                 read_move(MoveX,MoveY,NewX,NewY),
-                                                validate_move(Board,Turn,MoveX,MoveY,NewX,NewY),!,
-                                                move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn).
+                                                validate_move(Board,MoveX,MoveY,NewX,NewY,Turn),!.
 
 %choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces =< 0, BlackPieces =< 0),
 %                                                     Turn == blackturn, switch_turns(Turn,Turn),
@@ -75,10 +76,13 @@ validate_move(Board,X,Y,NewX,NewY,Turn) :- between(0, 5, X),
                                             between(0, 4, Y),
                                             has_piece(Board,X,Y,Turn),
                                             between(0, 5, NewX),
-                                            between(-1, 1, NewX-X),
+                                            DiffX is NewX-X,
+                                            between(-1, 1, DiffX),
                                             between(0, 4, NewY),
-                                            between(-1, 1, NewY-Y),
-                                            not_occupied(Board,X,Y).
+                                            DiffY is NewY-Y,
+                                            between(-1, 1, DiffY),
+                                            (DiffX=:=0;DiffY=:=0),
+                                            not_occupied(Board,NewX,NewY).
 
 
 has_piece(Board,X,Y,whiteturn) :- value_is(X, Y, 1, Board).
@@ -103,4 +107,3 @@ move_piece(Board,X,Y,NewX,NewY,NewBoard,whiteturn) :- replace(X,Y,0,Board,TempBo
 
 move_piece(Board,X,Y,NewX,NewY,NewBoard,blackturn) :- replace(X,Y,0,Board,TempBoard),
                                                       replace(NewX,NewY,2,TempBoard,NewBoard).
-

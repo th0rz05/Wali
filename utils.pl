@@ -15,22 +15,26 @@ switch_turns(blackturn,whiteturn).
 
 parse_move([L|[N|[]]],X,Y) :- X is L-97 , Y is N-49.
 
-parse_move([L|[N|['u'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+%up
+parse_move([L|[N|[117|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              Y is N-49,
                                              NewX is X,
                                              NewY is Y -1.
 
-parse_move([L|[N|['d'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+%down
+parse_move([L|[N|[100|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              Y is N-49,
                                              NewX is X,
                                              NewY is Y + 1.
 
-parse_move([L|[N|['l'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+%left
+parse_move([L|[N|[108|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              Y is N-49,
                                              NewX is X -1 ,
                                              NewY is Y.
 
-parse_move([L|[N|['r'|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
+%right
+parse_move([L|[N|[114|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              Y is N-49,
                                              NewX is X +1 ,
                                              NewY is Y.
