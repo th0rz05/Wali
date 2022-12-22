@@ -23,12 +23,18 @@ play_game(3,_,_,_,_,_) :- print_banner("To be developed",*,3).
 
 play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces),!,
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
                                                     press_any_key_to_continue,
                                                     display_game(Board,3,3,Turn,2),
                                                     game_cycle(Board,3,3,Turn,2).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY),
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
+                                                    print_banner("move passed",*,3),
+                                                    switch_turns(Turn,NewTurn),
+                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
+                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).                                                  
+
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,Turn,MoveX,MoveY),
                                                     place_piece(Board,MoveX,MoveY,NewBoard,Turn),
                                                     handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
                                                     switch_turns(Turn,NewTurn),
@@ -42,35 +48,20 @@ game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn
                                                     game_cycle(NewBoard,WhitePieces,BlackPieces,NewTurn,2).
 
 
-choose_place_piece(Board,WhitePieces,BlackPieces,whiteturn,MoveX,MoveY) :- WhitePieces>0,repeat,
-                                read_move(MoveX,MoveY),validate_place_piece(Board,MoveX,MoveY,whiteturn),!.
+choose_place_piece(Board,Turn,MoveX,MoveY) :- repeat,
+                                            read_move(MoveX,MoveY),
+                                            validate_place_piece(Board,MoveX,MoveY,Turn),!.
 
-choose_place_piece(Board,WhitePieces,BlackPieces,blackturn,MoveX,MoveY) :- BlackPieces>0,repeat,
-                                read_move(MoveX,MoveY),validate_place_piece(Board,MoveX,MoveY,blackturn),!.
 
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY) :- repeat,
                                                 read_move(MoveX,MoveY,NewX,NewY),
                                                 validate_move_piece(Board,MoveX,MoveY,NewX,NewY,Turn),!.
 
-%choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces =< 0, BlackPieces =< 0),
-%                                                     Turn == blackturn, switch_turns(Turn,Turn),
-%                                                     NewWhitePieces is (12 - WhitePieces),
-%                                                     NewBlackPieces is (12 - BlackPieces),
-%                                                     display_game(Board,WhitePieces,BlackPieces,Turn,2),
-%                                                     game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
+no_more_valid_place_piece_moves(Board) :- no_turn_place_piece_moves(Board,whiteturn),
+                                          no_turn_place_piece_moves(Board,blackturn).
 
-%choose_move(Board,WhitePieces,BlackPieces,Turn,MoveX,MoveY,Phase) :- (WhitePieces > 0; BlackPieces > 0),
-%                                                    print_banner("move passed",*,3),
-%                                                    switch_turns(Turn,NewTurn),
-%                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
-%                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).
-
-choose_piece(Board,X,Y,whiteturn) :- repeat,read_move(X,Y),nth0(X,Board,R1),nth0(Y,R1,R2),R2 == 1,!.
-
-no_more_valid_place_piece_moves(Board) :- valid_place_piece_moves(Board,whiteturn,Moves),
-                                         length(Moves,0),
-                                         valid_place_piece_moves(Board,blackturn,Moves),
-                                        length(Moves,0) .
+no_turn_place_piece_moves(Board,Turn) :- valid_place_piece_moves(Board,Turn,Moves),
+                                        length(Moves,0).
 
 valid_place_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).%write(Moves).
 
@@ -112,10 +103,21 @@ move_piece(Board,X,Y,NewX,NewY,NewBoard,whiteturn) :- replace(X,Y,0,Board,TempBo
 move_piece(Board,X,Y,NewX,NewY,NewBoard,blackturn) :- replace(X,Y,0,Board,TempBoard),
                                                       replace(NewX,NewY,2,TempBoard,NewBoard).
 
-
 %sem peças
-go_to_phase2(_,0,0).
+go_to_phase2(_,0,0,_).
 
 %sem moves
-go_to_phase2(Board,_,_) :- no_more_valid_place_piece_moves(Board).
-                                                                                               
+go_to_phase2(Board,_,_,_) :- no_more_valid_place_piece_moves(Board).
+
+%um sem moves e outro sem peças
+go_to_phase2(Board,0,_,blackturn) :- no_turn_place_piece_moves(Board,blackturn).
+go_to_phase2(Board,_,0,whiteturn) :- no_turn_place_piece_moves(Board,whiteturn).
+
+%sem peças                                                                                        
+pass_place_piece(_,0,_,whiteturn).
+
+pass_place_piece(_,_,0,blackturn).
+
+%sem moves
+pass_place_piece(Board,_,_,Turn) :- no_turn_place_piece_moves(Board,Turn).
+
