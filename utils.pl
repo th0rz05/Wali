@@ -1,8 +1,8 @@
-initial_state([ [0,1,0,1,2,1],
-                [2,0,2,0,1,2],
-                [0,1,0,1,0,1],
-                [0,2,1,0,2,0],
-                [2,1,2,1,0,0]],6,0,whiteturn,1).
+initial_state([ [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0]],3,3,whiteturn,1).
 
 display_piece(0) :- put_code(32).
 
@@ -39,9 +39,14 @@ parse_move([L|[N|[114|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              NewX is X +1 ,
                                              NewY is Y.
 
-press_any_key_to_continue :-
+press_any_key_to_continue(phase2) :-
     print_banner("PHASE 2 STARTING",*, 7),nl,nl,nl,
-    write('Press Enter to continue...'),
+    write('Press any key to continue...'),
+    get_char(_).
+
+press_any_key_to_continue(pass) :-
+    print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
+    write('Press any key to PASS...'),
     get_char(_).
 
 

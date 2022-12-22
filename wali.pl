@@ -24,12 +24,12 @@ play_game(3,_,_,_,_,_) :- print_banner("To be developed",*,3).
 play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
-                                                    press_any_key_to_continue,
+                                                    press_any_key_to_continue(phase2),
                                                     display_game(Board,3,3,Turn,2),
                                                     game_cycle(Board,3,3,Turn,2).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
-                                                    print_banner("move passed",*,3),
+                                                    press_any_key_to_continue(pass),
                                                     switch_turns(Turn,NewTurn),
                                                     display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
                                                     game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).                                                  
@@ -64,6 +64,8 @@ no_turn_place_piece_moves(Board,Turn) :- valid_place_piece_moves(Board,Turn,Move
                                         length(Moves,0).
 
 valid_place_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).%write(Moves).
+
+valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_piece(Board,X,Y,NewX,NewY,Turn), Moves), write(Moves).
 
 validate_place_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). 
 
@@ -103,10 +105,10 @@ move_piece(Board,X,Y,NewX,NewY,NewBoard,whiteturn) :- replace(X,Y,0,Board,TempBo
 move_piece(Board,X,Y,NewX,NewY,NewBoard,blackturn) :- replace(X,Y,0,Board,TempBoard),
                                                       replace(NewX,NewY,2,TempBoard,NewBoard).
 
-%sem peças
+%os dois sem peças
 go_to_phase2(_,0,0,_).
 
-%sem moves
+%os dois sem moves
 go_to_phase2(Board,_,_,_) :- no_more_valid_place_piece_moves(Board).
 
 %um sem moves e outro sem peças
