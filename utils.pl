@@ -13,6 +13,15 @@ display_piece(2) :- put_code(10103).
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
 
+list_append([], L, L).
+list_append([H | T1], L2, [H | T2]) :-
+    list_append(T1, L2, T2).
+
+list_append([], []) :- !.
+list_append([HL | T], OL) :-
+    list_append(T, IL),
+    list_append(HL, IL, OL).
+
 parse_move([L|[N|[]]],X,Y) :- X is L-97 , Y is N-49.
 
 %up
@@ -84,3 +93,21 @@ neighbor(X, Y, Board, Value) :-
    Y1 is Y + 1,
    value_is(X,Y1,Value,Board).
 
+
+my_sublist(L, M, N, S) :-
+    findall(E, (nth0(I, L, E), I >= M, I =< N), S).
+
+empty([[]|T]):- empty(T).
+empty([[]]).
+
+first([[P|A]|R], [P|Ps], [A|As]):- first(R, Ps, As).
+first([], [], []).
+
+
+invert_indexs(X-Y-D,Y-X-D).
+
+invert_columns_indexs([],[]).
+
+invert_columns_indexs([Pos|Tail],Positions) :- invert_columns_indexs(Tail,NewPositions),
+    										invert_indexs(Pos,NewPos),
+    										Positions = [NewPos | NewPositions].

@@ -123,3 +123,49 @@ pass_place_piece(_,_,0,blackturn).
 %sem moves
 pass_place_piece(Board,_,_,Turn) :- no_turn_place_piece_moves(Board,Turn).
 
+
+
+
+three_in_a_row(Nr,[Nr,Nr,Nr,Dif|[]]) :- Nr \= Dif.
+
+three_in_a_row(Nr,[Nr,Nr,Nr|[]]).
+
+check_for_3_in_a_row(_,List,_,Position,[],_,_) :- length(List,Size),
+    									MaxPosition is Size-2,
+    									Position =:= MaxPosition.
+
+
+check_for_3_in_a_row(Number,List,Number,Position,Positions,Direction,Column) :- nth0(Position, List, Element),
+    												NewPosition is Position + 1 ,
+    												check_for_3_in_a_row(Number,List,Element,NewPosition,NewPositions,Direction,Column),
+    												Positions = NewPositions.
+
+check_for_3_in_a_row(Number,List,_Diff,Position,Positions,Direction,Column) :-  UpperBound is Position+3,
+    												my_sublist(List,Position,UpperBound, Sublist),
+    												nth0(Position, List, Element),
+    												NewPosition is Position + 1 ,
+    												check_for_3_in_a_row(Number,List,Element,NewPosition,NewPositions,Direction,Column),
+    												(   three_in_a_row(Number,Sublist)->  Positions = [Position-Column-Direction| NewPositions];
+                                                       Positions = NewPositions).
+
+check_columns_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,0, ListofListofPositions,'v'), list_append(ListofListofPositions,Positions).
+
+check_rows_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,0, ListofListofPositions,'h'), list_append(ListofListofPositions,Positions).
+
+check_rows_for_3_in_a_row([Row|RestOfRows],Number,Column,Positions,Direction) :- NewColumn is Column + 1 ,
+    																	check_rows_for_3_in_a_row(RestOfRows,Number,NewColumn,NewPositions,Direction),
+    																	check_for_3_in_a_row(Number,Row,empty,0,Pos,Direction,Column),
+    																	Positions = [Pos|NewPositions].
+
+check_rows_for_3_in_a_row([],_,_,[],_).
+
+
+check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,RowPositions),
+    												transpose(Board,TransposedBoard),
+    												check_columns_for_3_in_a_row(TransposedBoard,Number,InvertedColumnPositions),
+    												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
+    												append(RowPositions,ColumnPositions,Positions).
+
+
+
+
