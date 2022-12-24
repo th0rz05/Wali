@@ -1,8 +1,8 @@
-initial_state([ [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],3,3,whiteturn,1).
+initial_state([ [2,1,2,0,1,0],
+                [1,2,1,2,0,2],
+                [2,0,2,0,2,1],
+                [0,1,0,1,0,2],
+                [1,0,2,0,1,0]],3,2,whiteturn,1).
 
 display_piece(0) :- put_code(32).
 
@@ -12,6 +12,9 @@ display_piece(2) :- put_code(10103).
 
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
+
+turn_number(whiteturn,1).
+turn_number(blackturn,2).
 
 list_append([], L, L).
 list_append([H | T1], L2, [H | T2]) :-
@@ -49,13 +52,14 @@ parse_move([L|[N|[114|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              NewY is Y.
 
 press_any_key_to_continue(phase2) :-
+    print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
     print_banner("PHASE 2 STARTING",*, 7),nl,nl,nl,
-    write('Press any key to continue...'),
+    write('Press ENTER to continue...'),
     get_char(_).
 
 press_any_key_to_continue(pass) :-
     print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
-    write('Press any key to PASS...'),
+    write('Press ENTER to PASS...'),
     get_char(_).
 
 
@@ -111,3 +115,4 @@ invert_columns_indexs([],[]).
 invert_columns_indexs([Pos|Tail],Positions) :- invert_columns_indexs(Tail,NewPositions),
     										invert_indexs(Pos,NewPos),
     										Positions = [NewPos | NewPositions].
+

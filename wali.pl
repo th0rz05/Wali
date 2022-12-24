@@ -25,8 +25,10 @@ play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
                                                     press_any_key_to_continue(phase2),
-                                                    display_game(Board,3,3,Turn,2),
-                                                    game_cycle(Board,3,3,Turn,2).
+                                                    NewWhitePieces is 12-WhitePieces,
+                                                    NewBlackPieces is 12-BlackPieces,
+                                                    display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
+                                                    game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
                                                     press_any_key_to_continue(pass),
@@ -43,15 +45,19 @@ game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,Tur
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,X,Y,NewX,NewY),
                                                     move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
+                                                    new_3_in_a_row(Board,NewBoard,Turn,FinalBoard),
                                                     switch_turns(Turn,NewTurn),
-                                                    display_game(NewBoard,WhitePieces,BlackPieces,NewTurn,2),
-                                                    game_cycle(NewBoard,WhitePieces,BlackPieces,NewTurn,2).
+                                                    display_game(FinalBoard,WhitePieces,BlackPieces,NewTurn,2),
+                                                    game_cycle(FinalBoard,WhitePieces,BlackPieces,NewTurn,2).
 
 
 choose_place_piece(Board,Turn,MoveX,MoveY) :- repeat,
-                                            read_move(MoveX,MoveY),
+                                            read_move(MoveX,MoveY,place),
                                             validate_place_piece(Board,MoveX,MoveY,Turn),!.
 
+choose_remove_piece(Board,Turn,MoveX,MoveY) :- repeat,
+                                            read_move(MoveX,MoveY,remove),
+                                            validate_remove_piece(Board,MoveX,MoveY,Turn),!.
 
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY) :- repeat,
                                                 read_move(MoveX,MoveY,NewX,NewY),
@@ -65,9 +71,13 @@ no_turn_place_piece_moves(Board,Turn) :- valid_place_piece_moves(Board,Turn,Move
 
 valid_place_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).%write(Moves).
 
+valid_remove_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves), write(Moves).
+
 valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_piece(Board,X,Y,NewX,NewY,Turn), Moves), write(Moves).
 
 validate_place_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). 
+
+validate_remove_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), has_enemy(Board,X,Y,Turn). 
 
 validate_move_piece(Board,X,Y,NewX,NewY,Turn) :- between(0, 5, X),
                                             between(0, 4, Y),
@@ -86,6 +96,10 @@ has_piece(Board,X,Y,whiteturn) :- value_is(X, Y, 1, Board).
 
 has_piece(Board,X,Y,blackturn) :- value_is(X, Y, 2, Board).
 
+has_enemy(Board,X,Y,whiteturn) :- value_is(X, Y, 2, Board).
+
+has_enemy(Board,X,Y,blackturn) :- value_is(X, Y, 1, Board).
+
 not_occupied(Board,X,Y) :- value_is(X, Y, 0, Board).
 
 no_neighbours(Board,X,Y,whiteturn) :- \+ neighbor(X, Y, Board, 1).
@@ -98,6 +112,10 @@ handle_pieces(WhitePieces,BlackPieces,blackturn,NewWhitePieces,NewBlackPieces) :
 place_piece(Board,X,Y,NewBoard,whiteturn) :- replace(X,Y,1,Board,NewBoard).
 
 place_piece(Board,X,Y,NewBoard,blackturn) :- replace(X,Y,2,Board,NewBoard).
+
+remove_piece(Board,X,Y,NewBoard) :- replace(X,Y,0,Board,NewBoard).
+
+remove_piece(Board,X,Y,NewBoard) :- replace(X,Y,0,Board,NewBoard).
 
 move_piece(Board,X,Y,NewX,NewY,NewBoard,whiteturn) :- replace(X,Y,0,Board,TempBoard),
                                                       replace(NewX,NewY,1,TempBoard,NewBoard).
@@ -159,13 +177,27 @@ check_rows_for_3_in_a_row([Row|RestOfRows],Number,Column,Positions,Direction) :-
 
 check_rows_for_3_in_a_row([],_,_,[],_).
 
-
 check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,RowPositions),
     												transpose(Board,TransposedBoard),
     												check_columns_for_3_in_a_row(TransposedBoard,Number,InvertedColumnPositions),
     												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
     												append(RowPositions,ColumnPositions,Positions).
 
+new_3_in_a_row(Board,NewBoard,Turn,FinalBoard) :- turn_number(Turn,Number),
+                                                  setof(OPositions,check_board_for_3_in_a_row(Board,Number,OPositions),SetOldPositions),
+                                                  [OldPositions|_] = SetOldPositions,
+                                                  write(OldPositions),
+                                                  setof(NPositions,check_board_for_3_in_a_row(NewBoard,Number,NPositions),SetNewPositions),
+                                                  [NewPositions|_] = SetNewPositions,
+                                                  write(NewPositions),
+                                                  length(OldPositions,OldLength),
+                                                  length(NewPositions,NewLength),
+                                                  OldPositions \= NewPositions,
+                                                  NewLength >= OldLength,!, %new 3 in a row
+                                                  valid_remove_piece_moves(NewBoard,Turn,Moves),
+                                                  choose_remove_piece(NewBoard,Turn,MoveX,MoveY),
+                                                  remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
+                                                  FinalBoard = BoardAfterRemove.
+                                                  
 
-
-
+new_3_in_a_row(_,NewBoard,_,NewBoard). %no new 3 in a row
