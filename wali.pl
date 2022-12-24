@@ -5,6 +5,7 @@
 :- [output].
 :- [input].
 :- use_module(library(lists)).
+:- use_module(library(between)).
 
 play :-
     repeat,
@@ -16,72 +17,193 @@ play :-
 play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                                                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_move(Board,WhitePieces,Turn,MoveX,MoveY),
-                                                    move(Board,MoveX,MoveY,NewBoard,Turn),
+play_game(2,_,_,_,_,_) :- print_banner("To be developed",*,3).
+
+play_game(3,_,_,_,_,_) :- print_banner("To be developed",*,3).
+
+play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
+
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
+                                                    press_any_key_to_continue(phase2),
+                                                    NewWhitePieces is 12-WhitePieces,
+                                                    NewBlackPieces is 12-BlackPieces,
+                                                    display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
+                                                    game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
+
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
+                                                    press_any_key_to_continue(pass),
                                                     switch_turns(Turn,NewTurn),
-                                                    display_game(NewBoard,WhitePieces,BlackPieces,NewTurn,1),
-                                                    game_cycle(NewBoard,WhitePieces,BlackPieces,NewTurn,1).
+                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
+                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).                                                  
 
-choose_move(Board,Pieces,Turn,MoveX,MoveY) :- Pieces>0,repeat,
-                                read_move(MoveX,MoveY),validate_move(Board,MoveX,MoveY,Turn),!.
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,Turn,MoveX,MoveY),
+                                                    place_piece(Board,MoveX,MoveY,NewBoard,Turn),
+                                                    handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
+                                                    switch_turns(Turn,NewTurn),
+                                                    display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
+                                                    game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1).
 
-valid_moves(Board,Turn,Moves) :- valid_moves(Board,Turn,4,5,Moves),write(Moves). %5-1 e 6-1 pq index 0
+game_cycle(Board,WhitePieces,BlackPieces,_,2) :-    game_over(Board,WhitePieces,BlackPieces,Winner),!,
+                                                    congratulate_winner(Winner).
 
+game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,X,Y,NewX,NewY),
+                                                    move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
+                                                    new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces),
+                                                    switch_turns(Turn,NewTurn),
+                                                    display_game(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2),
+                                                    game_cycle(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2).
 
-valid_moves(Board,Turn,-1,Y,[]).
-valid_moves(Board,Turn,X,Y,Moves) :- valid_moves_line(Board,Turn,X,Y,NewMovesLine),
-                                    X1 is X-1,
-                                    valid_moves(Board,Turn,X1,Y,NewMoves),
-                                    append(NewMoves,NewMovesLine,Moves).
+game_over(_,2,_,black).
 
-
-valid_moves_line(Board,Turn,X,-1,[]).
-valid_moves_line(Board,Turn,X,Y,MovesLine) :- validate_move(X,Y),
-                                    Y1 is Y-1,
-                                    valid_moves_line(Board,Turn,X,Y1,NewMovesLine),
-                                    append(NewMovesLine,[X-Y],MovesLine).
-
-
-validate_move(Board,X,Y,Turn) :- X >= 0, X < 5, Y >= 0, Y < 6, not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). %desenvolver um not_ocuppied(Board,X,Y) e no_neighbours(Board,X,Y,Turn) para ver se nao tem nenhum vizinho igual
-
-not_occupied(Board,X,Y) :- nth0(X,Board,R),
-                           nth0(Y,R,R2),
-                           R2 == 0.
-
-%corners
-no_neighbours(Board,0,0,whiteturn) :- nth0(0,Board,R), nth0(1,R,R2), R2\=1, nth0(1,Board,R3), nth0(0,R3,R4), R4\=1.
-no_neighbours(Board,0,0,blackturn) :- nth0(0,Board,R), nth0(1,R,R2), R2\=2, nth0(1,Board,R3), nth0(0,R3,R4), R4\=2.
-no_neighbours(Board,0,5,whiteturn) :- nth0(0,Board,R), nth0(4,R,R2), R2\=1, nth0(1,Board,R3), nth0(5,R3,R4), R4\=1.
-no_neighbours(Board,0,5,blackturn) :- nth0(0,Board,R), nth0(4,R,R2), R2\=2, nth0(1,Board,R3), nth0(5,R3,R4), R4\=2.
-no_neighbours(Board,4,0,whiteturn) :- nth0(3,Board,R), nth0(0,R,R2), R2\=1, nth0(4,Board,R3), nth0(1,R3,R4), R4\=1. 
-no_neighbours(Board,4,0,blackturn) :- nth0(3,Board,R), nth0(0,R,R2), R2\=2, nth0(4,Board,R3), nth0(1,R3,R4), R4\=2. 
-no_neighbours(Board,4,5,whiteturn) :- nth0(3,Board,R), nth0(5,R,R2), R2\=1, nth0(4,Board,R3), nth0(4,R3,R4), R4\=1. 
-no_neighbours(Board,4,5,blackturn) :- nth0(3,Board,R), nth0(5,R,R2), R2\=2, nth0(4,Board,R3), nth0(4,R3,R4), R4\=2. 
-%sides
-no_neighbours(Board,0,Y,whiteturn) :- nth0(0,Board,R), nth0(Y1,R,R2), R2\=1, nth0(0,Board,R3), nth0(Y2,R3,R4), R4\=1, nth0(1,Board,R5), nth0(Y,R5,R6), R6\=1, Y1 is Y-1, Y2 is Y+1.
-no_neighbours(Board,0,Y,blackturn) :- nth0(0,Board,R), nth0(Y1,R,R2), R2\=2, nth0(0,Board,R3), nth0(Y2,R3,R4), R4\=2, nth0(1,Board,R5), nth0(Y,R5,R6), R6\=2, Y1 is Y-1, Y2 is Y+1.
-no_neighbours(Board,X,0,whiteturn) :- nth0(X1,Board,R), nth0(0,R,R2), R2\=1, nth0(X2,Board,R3), nth0(0,R3,R4), R4\=1, nth0(X,Board,R5), nth0(1,R5,R6), R6\=1, X1 is X-1, X2 is X+1.
-no_neighbours(Board,X,0,blackturn) :- nth0(X1,Board,R), nth0(0,R,R2), R2\=2, nth0(X2,Board,R3), nth0(0,R3,R4), R4\=2, nth0(X,Board,R5), nth0(1,R5,R6), R6\=2, X1 is X-1, X2 is X+1.
-no_neighbours(Board,4,Y,whiteturn) :- nth0(4,Board,R), nth0(Y1,R,R2), R2\=1, nth0(4,Board,R3), nth0(Y2,R3,R4), R4\=1, nth0(3,Board,R5), nth0(Y,R5,R6), R6\=1, Y1 is Y-1, Y2 is Y+1.
-no_neighbours(Board,4,Y,blackturn) :- nth0(4,Board,R), nth0(Y1,R,R2), R2\=2, nth0(4,Board,R3), nth0(Y2,R3,R4), R4\=2, nth0(3,Board,R5), nth0(Y,R5,R6), R6\=2, Y1 is Y-1, Y2 is Y+1.
-no_neighbours(Board,X,5,whiteturn) :- nth0(X1,Board,R), nth0(5,R,R2), R2\=1, nth0(X2,Board,R3), nth0(5,R3,R4), R4\=1, nth0(X,Board,R5), nth0(4,R5,R6), R6\=1, X1 is X-1, X2 is X+1.
-no_neighbours(Board,X,5,blackturn) :- nth0(X1,Board,R), nth0(5,R,R2), R2\=2, nth0(X2,Board,R3), nth0(5,R3,R4), R4\=2, nth0(X,Board,R5), nth0(4,R5,R6), R6\=2, X1 is X-1, X2 is X+1.
-%middle
-no_neighbours(Board,X,Y,whiteturn) :-  nth0(X1,Board,R), nth0(Y,R,R2), R2\=1, nth0(X2,Board,R3), nth0(Y,R3,R4), R4\=1, nth0(X,Board,R5), nth0(Y1,R5,R6), R6\=1, nth0(X,Board,R7), nth0(Y2,R7,R8), R8\=1, X1 is X-1, X2 is X+1, Y1 is Y-1, Y2 is Y+1.
-no_neighbours(Board,X,Y,blackturn) :-  nth0(X1,Board,R), nth0(Y,R,R2), R2\=2, nth0(X2,Board,R3), nth0(Y,R3,R4), R4\=2, nth0(X,Board,R5), nth0(Y1,R5,R6), R6\=2, nth0(X,Board,R7), nth0(Y2,R7,R8), R8\=2, X1 is X-1, X2 is X+1, Y1 is Y-1, Y2 is Y+1.
+game_over(_,_,2,white).
 
 
-move([Line|Rest],0,Y,[NewLine|Rest],whiteturn) :- replace(Line,Y,_O,1,NewLine).
+choose_place_piece(Board,Turn,MoveX,MoveY) :- repeat,
+                                            read_move(MoveX,MoveY,place),
+                                            validate_place_piece(Board,MoveX,MoveY,Turn),!.
 
-move([Line|Rest],0,Y,[NewLine|Rest],blackturn) :- replace(Line,Y,_O,2,NewLine).
+choose_remove_piece(Board,Turn,MoveX,MoveY) :- repeat,
+                                            read_move(MoveX,MoveY,remove),
+                                            validate_remove_piece(Board,MoveX,MoveY,Turn),!.
 
-move([Line|Rest],X,Y,NewBoard,Turn) :- X1 is X-1,
-                                        move(Rest,X1,Y,NB,Turn),
-                                        NewBoard =[Line|NB].
+choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY) :- repeat,
+                                                read_move(MoveX,MoveY,NewX,NewY),
+                                                validate_move_piece(Board,MoveX,MoveY,NewX,NewY,Turn),!.
+
+no_more_valid_place_piece_moves(Board) :- no_turn_place_piece_moves(Board,whiteturn),
+                                          no_turn_place_piece_moves(Board,blackturn).
+
+no_turn_place_piece_moves(Board,Turn) :- valid_place_piece_moves(Board,Turn,Moves),
+                                        length(Moves,0).
+
+valid_place_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).%write(Moves).
+
+valid_remove_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves), write(Moves).
+
+valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_piece(Board,X,Y,NewX,NewY,Turn), Moves), write(Moves).
+
+validate_place_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). 
+
+validate_remove_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), has_enemy(Board,X,Y,Turn). 
+
+validate_move_piece(Board,X,Y,NewX,NewY,Turn) :- between(0, 5, X),
+                                            between(0, 4, Y),
+                                            has_piece(Board,X,Y,Turn),
+                                            between(0, 5, NewX),
+                                            DiffX is NewX-X,
+                                            between(-1, 1, DiffX),
+                                            between(0, 4, NewY),
+                                            DiffY is NewY-Y,
+                                            between(-1, 1, DiffY),
+                                            (DiffX=:=0;DiffY=:=0),
+                                            not_occupied(Board,NewX,NewY).
 
 
-play_game(2) :- print_banner("To be developed",*,3).
+has_piece(Board,X,Y,whiteturn) :- value_is(X, Y, 1, Board).
 
-play_game(3) :- print_banner("To be developed",*,3).
+has_piece(Board,X,Y,blackturn) :- value_is(X, Y, 2, Board).
 
-play_game(0) :- print_banner("Thank you for playing!",*,3).
+has_enemy(Board,X,Y,whiteturn) :- value_is(X, Y, 2, Board).
+
+has_enemy(Board,X,Y,blackturn) :- value_is(X, Y, 1, Board).
+
+not_occupied(Board,X,Y) :- value_is(X, Y, 0, Board).
+
+no_neighbours(Board,X,Y,whiteturn) :- \+ neighbor(X, Y, Board, 1).
+
+no_neighbours(Board,X,Y,blackturn) :- \+ neighbor(X, Y, Board, 2).
+
+handle_pieces(WhitePieces,BlackPieces,whiteturn,NewWhitePieces,NewBlackPieces) :- NewWhitePieces is WhitePieces-1,NewBlackPieces is BlackPieces.
+handle_pieces(WhitePieces,BlackPieces,blackturn,NewWhitePieces,NewBlackPieces) :- NewBlackPieces is BlackPieces-1,NewWhitePieces is WhitePieces.
+
+place_piece(Board,X,Y,NewBoard,whiteturn) :- replace(X,Y,1,Board,NewBoard).
+
+place_piece(Board,X,Y,NewBoard,blackturn) :- replace(X,Y,2,Board,NewBoard).
+
+remove_piece(Board,X,Y,NewBoard) :- replace(X,Y,0,Board,NewBoard).
+
+remove_piece(Board,X,Y,NewBoard) :- replace(X,Y,0,Board,NewBoard).
+
+move_piece(Board,X,Y,NewX,NewY,NewBoard,whiteturn) :- replace(X,Y,0,Board,TempBoard),
+                                                      replace(NewX,NewY,1,TempBoard,NewBoard).
+
+move_piece(Board,X,Y,NewX,NewY,NewBoard,blackturn) :- replace(X,Y,0,Board,TempBoard),
+                                                      replace(NewX,NewY,2,TempBoard,NewBoard).
+
+%os dois sem peças
+go_to_phase2(_,0,0,_).
+
+%os dois sem moves
+go_to_phase2(Board,_,_,_) :- no_more_valid_place_piece_moves(Board).
+
+%um sem moves e outro sem peças
+go_to_phase2(Board,0,_,blackturn) :- no_turn_place_piece_moves(Board,blackturn).
+go_to_phase2(Board,_,0,whiteturn) :- no_turn_place_piece_moves(Board,whiteturn).
+
+%sem peças                                                                                        
+pass_place_piece(_,0,_,whiteturn).
+
+pass_place_piece(_,_,0,blackturn).
+
+%sem moves
+pass_place_piece(Board,_,_,Turn) :- no_turn_place_piece_moves(Board,Turn).
+
+
+
+
+three_in_a_row(Nr,[Nr,Nr,Nr,Dif|[]]) :- Nr \= Dif.
+
+three_in_a_row(Nr,[Nr,Nr,Nr|[]]).
+
+check_for_3_in_a_row(_,List,_,Position,[],_,_) :- length(List,Size),
+    									MaxPosition is Size-2,
+    									Position =:= MaxPosition.
+
+
+check_for_3_in_a_row(Number,List,Number,Position,Positions,Direction,Column) :- nth0(Position, List, Element),
+    												NewPosition is Position + 1 ,
+    												check_for_3_in_a_row(Number,List,Element,NewPosition,NewPositions,Direction,Column),
+    												Positions = NewPositions.
+
+check_for_3_in_a_row(Number,List,_Diff,Position,Positions,Direction,Column) :-  UpperBound is Position+3,
+    												my_sublist(List,Position,UpperBound, Sublist),
+    												nth0(Position, List, Element),
+    												NewPosition is Position + 1 ,
+    												check_for_3_in_a_row(Number,List,Element,NewPosition,NewPositions,Direction,Column),
+    												(   three_in_a_row(Number,Sublist)->  Positions = [Position-Column-Direction| NewPositions];
+                                                       Positions = NewPositions).
+
+check_columns_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,0, ListofListofPositions,'v'), list_append(ListofListofPositions,Positions).
+
+check_rows_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,0, ListofListofPositions,'h'), list_append(ListofListofPositions,Positions).
+
+check_rows_for_3_in_a_row([Row|RestOfRows],Number,Column,Positions,Direction) :- NewColumn is Column + 1 ,
+    																	check_rows_for_3_in_a_row(RestOfRows,Number,NewColumn,NewPositions,Direction),
+    																	check_for_3_in_a_row(Number,Row,empty,0,Pos,Direction,Column),
+    																	Positions = [Pos|NewPositions].
+
+check_rows_for_3_in_a_row([],_,_,[],_).
+
+check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,RowPositions),
+    												transpose(Board,TransposedBoard),
+    												check_columns_for_3_in_a_row(TransposedBoard,Number,InvertedColumnPositions),!,
+    												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
+    												append(RowPositions,ColumnPositions,Positions).
+
+new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces) :- 
+                                                turn_number(Turn,Number),
+                                                check_board_for_3_in_a_row(Board,Number,OldPositions),
+                                                check_board_for_3_in_a_row(NewBoard,Number,NewPositions),
+                                                length(OldPositions,OldLength),
+                                                length(NewPositions,NewLength),
+                                                OldPositions \= NewPositions,
+                                                NewLength >= OldLength,!, %new 3 in a row
+                                                display_game(NewBoard,WhitePieces,BlackPieces,Turn,2),
+                                                print_banner("3 IN A ROW",*, 7),nl,
+                                                choose_remove_piece(NewBoard,Turn,MoveX,MoveY),
+                                                remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
+                                                deal_with_pieces_after_remove(Turn,WhitePieces,BlackPieces,NewWhitePieces,NewBlackPieces),
+                                                FinalBoard = BoardAfterRemove.
+                                                  
+
+new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces). %no new 3 in a row
