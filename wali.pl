@@ -186,16 +186,14 @@ check_rows_for_3_in_a_row([],_,_,[],_).
 
 check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(Board,Number,RowPositions),
     												transpose(Board,TransposedBoard),
-    												check_columns_for_3_in_a_row(TransposedBoard,Number,InvertedColumnPositions),
+    												check_columns_for_3_in_a_row(TransposedBoard,Number,InvertedColumnPositions),!,
     												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
     												append(RowPositions,ColumnPositions,Positions).
 
 new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces) :- 
                                                 turn_number(Turn,Number),
-                                                setof(OPositions,check_board_for_3_in_a_row(Board,Number,OPositions),SetOldPositions),
-                                                [OldPositions|_] = SetOldPositions,
-                                                setof(NPositions,check_board_for_3_in_a_row(NewBoard,Number,NPositions),SetNewPositions),
-                                                [NewPositions|_] = SetNewPositions,
+                                                check_board_for_3_in_a_row(Board,Number,OldPositions),
+                                                check_board_for_3_in_a_row(NewBoard,Number,NewPositions),
                                                 length(OldPositions,OldLength),
                                                 length(NewPositions,NewLength),
                                                 OldPositions \= NewPositions,

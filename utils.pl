@@ -4,6 +4,7 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0]],12,12,whiteturn,1).
 
+
 display_piece(0) :- put_code(32).
 
 display_piece(1) :- put_code(9312).
