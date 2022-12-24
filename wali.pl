@@ -43,12 +43,19 @@ game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,Tur
                                                     display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
                                                     game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1).
 
+game_cycle(Board,WhitePieces,BlackPieces,_,2) :-    game_over(Board,WhitePieces,BlackPieces,Winner),!,
+                                                    congratulate_winner(Winner).
+
 game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,X,Y,NewX,NewY),
                                                     move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
-                                                    new_3_in_a_row(Board,NewBoard,Turn,FinalBoard),
+                                                    new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces),
                                                     switch_turns(Turn,NewTurn),
-                                                    display_game(FinalBoard,WhitePieces,BlackPieces,NewTurn,2),
-                                                    game_cycle(FinalBoard,WhitePieces,BlackPieces,NewTurn,2).
+                                                    display_game(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2),
+                                                    game_cycle(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2).
+
+game_over(_,2,_,black).
+
+game_over(_,_,2,white).
 
 
 choose_place_piece(Board,Turn,MoveX,MoveY) :- repeat,
@@ -183,21 +190,22 @@ check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(
     												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
     												append(RowPositions,ColumnPositions,Positions).
 
-new_3_in_a_row(Board,NewBoard,Turn,FinalBoard) :- turn_number(Turn,Number),
-                                                  setof(OPositions,check_board_for_3_in_a_row(Board,Number,OPositions),SetOldPositions),
-                                                  [OldPositions|_] = SetOldPositions,
-                                                  write(OldPositions),
-                                                  setof(NPositions,check_board_for_3_in_a_row(NewBoard,Number,NPositions),SetNewPositions),
-                                                  [NewPositions|_] = SetNewPositions,
-                                                  write(NewPositions),
-                                                  length(OldPositions,OldLength),
-                                                  length(NewPositions,NewLength),
-                                                  OldPositions \= NewPositions,
-                                                  NewLength >= OldLength,!, %new 3 in a row
-                                                  valid_remove_piece_moves(NewBoard,Turn,Moves),
-                                                  choose_remove_piece(NewBoard,Turn,MoveX,MoveY),
-                                                  remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
-                                                  FinalBoard = BoardAfterRemove.
+new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces) :- 
+                                                turn_number(Turn,Number),
+                                                setof(OPositions,check_board_for_3_in_a_row(Board,Number,OPositions),SetOldPositions),
+                                                [OldPositions|_] = SetOldPositions,
+                                                setof(NPositions,check_board_for_3_in_a_row(NewBoard,Number,NPositions),SetNewPositions),
+                                                [NewPositions|_] = SetNewPositions,
+                                                length(OldPositions,OldLength),
+                                                length(NewPositions,NewLength),
+                                                OldPositions \= NewPositions,
+                                                NewLength >= OldLength,!, %new 3 in a row
+                                                display_game(NewBoard,WhitePieces,BlackPieces,Turn,2),
+                                                print_banner("3 IN A ROW",*, 7),nl,
+                                                choose_remove_piece(NewBoard,Turn,MoveX,MoveY),
+                                                remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
+                                                deal_with_pieces_after_remove(Turn,WhitePieces,BlackPieces,NewWhitePieces,NewBlackPieces),
+                                                FinalBoard = BoardAfterRemove.
                                                   
 
-new_3_in_a_row(_,NewBoard,_,NewBoard). %no new 3 in a row
+new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces). %no new 3 in a row

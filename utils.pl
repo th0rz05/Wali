@@ -1,8 +1,8 @@
-initial_state([ [2,1,2,0,1,0],
-                [1,2,1,2,0,2],
-                [2,0,2,0,2,1],
-                [0,1,0,1,0,2],
-                [1,0,2,0,1,0]],3,2,whiteturn,1).
+initial_state([ [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0],
+                [0,0,0,0,0,0]],12,12,whiteturn,1).
 
 display_piece(0) :- put_code(32).
 
@@ -62,6 +62,9 @@ press_any_key_to_continue(pass) :-
     write('Press ENTER to PASS...'),
     get_char(_).
 
+congratulate_winner(white) :- print_banner("WINNER!! CONGRATULATIONS WHITE",*, 7),nl,nl.
+
+congratulate_winner(black) :- print_banner("WINNER!! CONGRATULATIONS BLACK",*, 7),nl,nl.
 
 replace(X, Y, Value, List, NewList) :-
     nth0(Y, List, Row),
@@ -116,3 +119,7 @@ invert_columns_indexs([Pos|Tail],Positions) :- invert_columns_indexs(Tail,NewPos
     										invert_indexs(Pos,NewPos),
     										Positions = [NewPos | NewPositions].
 
+
+deal_with_pieces_after_remove(blackturn,WhitePieces,BlackPieces,NewWhitePieces,BlackPieces) :- NewWhitePieces is WhitePieces - 1.
+
+deal_with_pieces_after_remove(whiteturn,WhitePieces,BlackPieces,WhitePieces,NewBlackPieces) :- NewBlackPieces is BlackPieces - 1.
