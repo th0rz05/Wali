@@ -6,69 +6,117 @@
 :- [input].
 :- use_module(library(lists)).
 :- use_module(library(between)).
+:- use_module(library(random)).
 
 play :-
-    repeat,
     display_start_menu,
-    read_until_between(0,3,Option),
+    read_until_between(0,4,Option),
     initial_state(InitialBoard,WhitePieces,BlackPieces,Turn,Phase),
     play_game(Option,InitialBoard,WhitePieces,BlackPieces,Turn,Phase).
 
-play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
-                                                        game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase).
+play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- 
+                        display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
+                        game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,human,human).
 
-play_game(2,_,_,_,_,_) :- print_banner("To be developed",*,3).
+play_game(2,Board,WhitePieces,BlackPieces,Turn,Phase) :- 
+                        display_select_difficulty_menu(black),
+                        read_until_between(1,2,Option),
+                        turn_option_into_ai(Option,AI),
+                        display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
+                        game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,human,AI).
 
-play_game(3,_,_,_,_,_) :- print_banner("To be developed",*,3).
+play_game(3,Board,WhitePieces,BlackPieces,Turn,Phase) :- 
+                        display_select_difficulty_menu(white),
+                        read_until_between(1,2,Option),
+                        turn_option_into_ai(Option,AI),
+                        display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
+                        game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,AI,human).
 
-play_game(0,_,_,_,_,_) :- print_banner("Thank you for playing!",*,3).
+play_game(4,Board,WhitePieces,BlackPieces,Turn,Phase) :- 
+                        display_select_difficulty_menu(white),
+                        read_until_between(1,2,OptionWhite),
+                        turn_option_into_ai(OptionWhite,AIWhite),
+                        display_select_difficulty_menu(black),
+                        read_until_between(1,2,OptionBlack),
+                        turn_option_into_ai(OptionBlack,AIBlack),
+                        display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
+                        game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,AIWhite,AIBlack).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
-                                                    press_any_key_to_continue(phase2),
-                                                    NewWhitePieces is 12-WhitePieces,
-                                                    NewBlackPieces is 12-BlackPieces,
-                                                    display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
-                                                    game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2).
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
+                        go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
+                        press_any_key_to_continue(phase2),
+                        NewWhitePieces is 4-WhitePieces,
+                        NewBlackPieces is 4-BlackPieces,
+                        display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
+                        game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2,WhitePlayer,BlackPlayer).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
-                                                    press_any_key_to_continue(pass),
-                                                    switch_turns(Turn,NewTurn),
-                                                    display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
-                                                    game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1).                                                  
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
+                        pass_place_piece(Board,WhitePieces,BlackPieces,Turn),!,
+                        press_any_key_to_continue(pass),
+                        switch_turns(Turn,NewTurn),
+                        display_game(Board,WhitePieces,BlackPieces,NewTurn,1),
+                        game_cycle(Board,WhitePieces,BlackPieces,NewTurn,1,WhitePlayer,BlackPlayer).                                                  
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,1) :- choose_place_piece(Board,Turn,MoveX,MoveY),
-                                                    place_piece(Board,MoveX,MoveY,NewBoard,Turn),
-                                                    handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
-                                                    switch_turns(Turn,NewTurn),
-                                                    display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
-                                                    game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1).
+game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
+                        choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer),
+                        place_piece(Board,MoveX,MoveY,NewBoard,Turn),
+                        handle_pieces(WhitePieces,BlackPieces,Turn,WhitePieces1,BlackPieces1),
+                        switch_turns(Turn,NewTurn),
+                        display_game(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1),
+                        game_cycle(NewBoard,WhitePieces1,BlackPieces1,NewTurn,1,WhitePlayer,BlackPlayer).
 
-game_cycle(Board,WhitePieces,BlackPieces,_,2) :-    game_over(Board,WhitePieces,BlackPieces,Winner),!,
-                                                    congratulate_winner(Winner).
+game_cycle(Board,WhitePieces,BlackPieces,_,2,_,_) :-    
+                        game_over(Board,WhitePieces,BlackPieces,Winner),!,
+                        congratulate_winner(Winner).
 
-game_cycle(Board,WhitePieces,BlackPieces,Turn,2) :- choose_move_piece(Board,Turn,X,Y,NewX,NewY),
-                                                    move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
-                                                    new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces),
-                                                    switch_turns(Turn,NewTurn),
-                                                    display_game(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2),
-                                                    game_cycle(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2).
+game_cycle(Board,WhitePieces,BlackPieces,Turn,2,WhitePlayer,BlackPlayer) :- 
+                        choose_move_piece(Board,Turn,X,Y,NewX,NewY,WhitePlayer,BlackPlayer),
+                        move_piece(Board,X,Y,NewX,NewY,NewBoard,Turn),
+                        new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces,WhitePlayer,BlackPlayer),
+                        switch_turns(Turn,NewTurn),
+                        display_game(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2),
+                        game_cycle(FinalBoard,NewWhitePieces,NewBlackPieces,NewTurn,2,WhitePlayer,BlackPlayer).
 
 game_over(_,2,_,black).
 
 game_over(_,_,2,white).
 
 
-choose_place_piece(Board,Turn,MoveX,MoveY) :- repeat,
-                                            read_move(MoveX,MoveY,place),
-                                            validate_place_piece(Board,MoveX,MoveY,Turn),!.
+choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        human_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        repeat,
+                        read_move(MoveX,MoveY,place),
+                        validate_place_piece(Board,MoveX,MoveY,Turn),!.
 
-choose_remove_piece(Board,Turn,MoveX,MoveY) :- repeat,
-                                            read_move(MoveX,MoveY,remove),
-                                            validate_remove_piece(Board,MoveX,MoveY,Turn),!.
+choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        computer1_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_place_piece_moves(Board,Turn,Moves),
+                        random_member(MoveX-MoveY,Moves),
+                        press_any_key_to_continue(ai_place,MoveX,MoveY).
 
-choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY) :- repeat,
-                                                read_move(MoveX,MoveY,NewX,NewY),
-                                                validate_move_piece(Board,MoveX,MoveY,NewX,NewY,Turn),!.
+choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
+                        human_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        repeat,
+                        read_move(MoveX,MoveY,NewX,NewY),
+                        validate_move_piece(Board,MoveX,MoveY,NewX,NewY,Turn),!.
+
+choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
+                        computer1_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_move_piece_moves(Board,Turn,Moves),
+                        random_member(MoveX-MoveY-NewX-NewY,Moves),
+                        press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY).
+
+choose_remove_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        human_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        repeat,
+                        read_move(MoveX,MoveY,remove),
+                        validate_remove_piece(Board,MoveX,MoveY,Turn),!.
+
+choose_remove_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        computer1_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_remove_piece_moves(Board,Turn,Moves),
+                        random_member(MoveX-MoveY,Moves),
+                        press_any_key_to_continue(ai_remove,MoveX,MoveY).
 
 no_more_valid_place_piece_moves(Board) :- no_turn_place_piece_moves(Board,whiteturn),
                                           no_turn_place_piece_moves(Board,blackturn).
@@ -78,9 +126,9 @@ no_turn_place_piece_moves(Board,Turn) :- valid_place_piece_moves(Board,Turn,Move
 
 valid_place_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).%write(Moves).
 
-valid_remove_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves), write(Moves).
+valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_piece(Board,X,Y,NewX,NewY,Turn), Moves).%write(Moves).
 
-valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_piece(Board,X,Y,NewX,NewY,Turn), Moves), write(Moves).
+valid_remove_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves).%write(Moves).
 
 validate_place_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). 
 
@@ -190,7 +238,7 @@ check_board_for_3_in_a_row(Board,Number,Positions) :- check_rows_for_3_in_a_row(
     												invert_columns_indexs(InvertedColumnPositions,ColumnPositions),
     												append(RowPositions,ColumnPositions,Positions).
 
-new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces) :- 
+new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePieces,NewBlackPieces,WhitePlayer,BlackPlayer) :- 
                                                 turn_number(Turn,Number),
                                                 check_board_for_3_in_a_row(Board,Number,OldPositions),
                                                 check_board_for_3_in_a_row(NewBoard,Number,NewPositions),
@@ -200,10 +248,10 @@ new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePi
                                                 NewLength >= OldLength,!, %new 3 in a row
                                                 display_game(NewBoard,WhitePieces,BlackPieces,Turn,2),
                                                 print_banner("3 IN A ROW",*, 7),nl,
-                                                choose_remove_piece(NewBoard,Turn,MoveX,MoveY),
+                                                choose_remove_piece(NewBoard,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer),
                                                 remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
                                                 deal_with_pieces_after_remove(Turn,WhitePieces,BlackPieces,NewWhitePieces,NewBlackPieces),
                                                 FinalBoard = BoardAfterRemove.
                                                   
 
-new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces). %no new 3 in a row
+new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces,_,_). %no new 3 in a row

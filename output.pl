@@ -98,12 +98,33 @@ display_start_menu :-
     write('   |                                                                                   |   '),nl,
     write('   |                               1 - PLAYER VS PLAYER                                |   '),nl,
     write('   |                               2 - PLAYER VS COMPUTER                              |   '),nl,
-    write('   |                               3 - COMPUTER VS COMPUTER                            |   '),nl,
+    write('   |                               3 - COMPUTER VS PLAYER                              |   '),nl,
+    write('   |                               4 - COMPUTER VS COMPUTER                            |   '),nl,
     write('   |                               0 - EXIT                                            |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   *************************************************************************************   '),nl,nl.
  
-                                                                             
+display_select_difficulty_menu(white) :-
+    nl,
+    write('   *************************************************************************************   '),nl,
+    write('   |                              Select white AI difficulty                           |   '),nl,
+    write('   |                                                                                   |   '),nl,
+    write('   |                                     1 - EASY                                      |   '),nl,
+    write('   |                                     2 - HARD                                      |   '),nl,
+    write('   |                                                                                   |   '),nl,
+    write('   *************************************************************************************   '),nl,nl.
+
+display_select_difficulty_menu(black) :-
+    nl,
+    write('   *************************************************************************************   '),nl,
+    write('   |                              Select black AI difficulty                           |   '),nl,
+    write('   |                                                                                   |   '),nl,
+    write('   |                                     1 - EASY                                      |   '),nl,
+    write('   |                                     2 - HARD                                      |   '),nl,
+    write('   |                                                                                   |   '),nl,
+    write('   *************************************************************************************   '),nl,nl.
+
+
 display_game([H | T],WhitePieces,BlackPieces,Turn,Phase) :-
     nl,nl,nl,
     display_phase(Phase),
@@ -152,7 +173,10 @@ display_turn(whiteturn) :- print_banner("White's turn",*, 7),nl,nl.
 
 display_turn(blackturn) :- print_banner("Black's turn",*, 7),nl,nl.   
                                                                              
-                                                                             
+display_move(MoveX,MoveY) :- 
+                    letter_to_number(MoveX,Letter),
+                    NewMoveY is MoveY+1,
+                    write(Letter),write(NewMoveY).                                                                            
                                                                              
 
 

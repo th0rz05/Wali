@@ -2,7 +2,7 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],12,12,whiteturn,1).
+                [0,0,0,0,0,0]],4,4,whiteturn,1).
 
 
 display_piece(0) :- put_code(32).
@@ -62,6 +62,25 @@ press_any_key_to_continue(pass) :-
     print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
     write('Press ENTER to PASS...'),
     get_char(_).
+
+press_any_key_to_continue(ai_place,MoveX,MoveY) :-
+    write('Computer will place a piece in '),
+    display_move(MoveX,MoveY),nl,
+    write('Press ENTER to CONTINUE...'),
+    get_char(_).
+
+press_any_key_to_continue(ai_remove,MoveX,MoveY) :-
+    write('Computer will remove the piece from '),
+    display_move(MoveX,MoveY),nl,
+    write('Press ENTER to CONTINUE...'),
+    get_char(_).
+
+press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY) :-
+    write('Computer will make the move '),
+    display_move(MoveX,MoveY),write(' to '),display_move(NewX,NewY),nl,
+    write('Press ENTER to CONTINUE...'),
+    get_char(_).
+
 
 congratulate_winner(white) :- print_banner("WINNER!! CONGRATULATIONS WHITE",*, 7),nl,nl.
 
@@ -124,3 +143,23 @@ invert_columns_indexs([Pos|Tail],Positions) :- invert_columns_indexs(Tail,NewPos
 deal_with_pieces_after_remove(blackturn,WhitePieces,BlackPieces,NewWhitePieces,BlackPieces) :- NewWhitePieces is WhitePieces - 1.
 
 deal_with_pieces_after_remove(whiteturn,WhitePieces,BlackPieces,WhitePieces,NewBlackPieces) :- NewBlackPieces is BlackPieces - 1.
+
+
+human_turn(whiteturn,human,_).
+human_turn(blackturn,_,human).
+
+computer1_turn(whiteturn,computer1,_).
+computer1_turn(blackturn,_,computer1).
+
+computer2_turn(whiteturn,computer2,_).
+computer2_turn(blackturn,_,computer2).
+
+turn_option_into_ai(1,computer1).
+turn_option_into_ai(2,computer2).
+
+letter_to_number(0,'a').
+letter_to_number(1,'b').
+letter_to_number(2,'c').
+letter_to_number(3,'d').
+letter_to_number(4,'e').
+letter_to_number(5,'f').
