@@ -100,7 +100,7 @@ choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :-
                         computer2_turn(Turn,WhitePlayer,BlackPlayer),!,
                         valid_place_piece_moves(Board,Turn,Moves),
                         setof(Value-MvX-MvY, NewBoard^( member(MvX-MvY, Moves),place_piece(Board,MvX,MvY,NewBoard,Turn),value(place,NewBoard,Turn,Value)),ValueMoves),
-                        last_3_elements(ValueMoves,BestMoves),
+                        last_X_elements(ValueMoves,3,BestMoves),
                         random_member(_Value-MoveX-MoveY,BestMoves),
                         press_any_key_to_continue(ai_place,MoveX,MoveY).
 
@@ -116,6 +116,14 @@ choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :-
                         random_member(MoveX-MoveY-NewX-NewY,Moves),
                         press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY).
 
+choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
+                        computer2_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_move_piece_moves(Board,Turn,Moves),
+                        setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,NewBoard,Turn,Value)),ValueMoves),
+                        last_X_elements(ValueMoves,1,BestMoves),
+                        random_member(_Value-MoveX-MoveY-NewX-NewY,BestMoves),
+                        press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY).
+
 choose_remove_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
                         human_turn(Turn,WhitePlayer,BlackPlayer),!,
                         repeat,
@@ -126,6 +134,14 @@ choose_remove_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :-
                         computer1_turn(Turn,WhitePlayer,BlackPlayer),!,
                         valid_remove_piece_moves(Board,Turn,Moves),
                         random_member(MoveX-MoveY,Moves),
+                        press_any_key_to_continue(ai_remove,MoveX,MoveY).
+
+choose_remove_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        computer2_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_remove_piece_moves(Board,Turn,Moves),
+                        setof(Value-MvX-MvY, NewBoard^( member(MvX-MvY, Moves),remove_piece(Board,MvX,MvY,NewBoard),value(remove,NewBoard,Turn,Value)),ValueMoves),
+                        last_X_elements(ValueMoves,3,BestMoves),
+                        random_member(_Value-MoveX-MoveY,BestMoves),
                         press_any_key_to_continue(ai_remove,MoveX,MoveY).
 
 no_more_valid_place_piece_moves(Board) :- no_turn_place_piece_moves(Board,whiteturn),
@@ -267,7 +283,20 @@ new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePi
 new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces,_,_). %no new 3 in a row
 
 
-value(place,Board,Turn,Value) :- turn_number(Turn,TurnNumber),value(place,Board,Board,TurnNumber,0,Value).
+value(place,Board,Turn,Value) :- 
+                turn_number(Turn,TurnNumber),
+                value(place,Board,Board,TurnNumber,0,Value).
+
+value(move,Board,Turn,Value) :- 
+                turn_number(Turn,TurnNumber),
+                check_board_for_3_in_a_row(Board,TurnNumber,Positions),
+                length(Positions,Value).
+
+value(remove,Board,Turn,NegativeValue) :-
+                switch_turns(Turn,NextTurn),
+                get_best_move_piece(Board,NextTurn,Value,_MoveX,_MoveY,_NewX,_NewY),
+                NegativeValue is -Value.
+
     
 value(place,[],_,_,_,0).
 value(place,[Row|Rows],CompleteBoard,Turn,Y,Result) :-
@@ -282,3 +311,11 @@ value_row(place,[_Elem|Elems],Board,Turn,X,Y,Result) :-
     value_row(place,Elems,Board,Turn,X1,Y,SubResult),
     get_nr_of_neighbor_diagonal(X,Y,Board,Turn,Nr),
     Result is SubResult + Nr.
+
+
+get_best_move_piece(Board,Turn,Value,MoveX,MoveY,NewX,NewY) :-
+            valid_move_piece_moves(Board,Turn,Moves),
+            setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,NewBoard,Turn,Value)),ValueMoves),
+            last_X_elements(ValueMoves,1,BestMoves),
+            random_member(Value-MoveX-MoveY-NewX-NewY,BestMoves).
+

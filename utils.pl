@@ -198,13 +198,13 @@ letter_to_number(4,'e').
 letter_to_number(5,'f').
 
 
-last_3_elements(List, Last3) :-
+last_X_elements(List,X,LastX) :-
     length(List, Length),
-    ( Length < 3 ->
-        Last3 = List
+    ( Length < X ->
+        LastX = List
     ;
         reverse(List, Reversed),
-        length(Last3, 3),
-        append(Last3, _, Reversed)
+        length(LastX, X),
+        append(LastX, _, Reversed)
     ).
-     
+   
