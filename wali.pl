@@ -42,6 +42,8 @@ play_game(4,Board,WhitePieces,BlackPieces,Turn,Phase) :-
                         display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,AIWhite,AIBlack).
 
+play_game(4,_,_,_,_,_).
+
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
                         go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
                         press_any_key_to_continue(phase2),
@@ -92,6 +94,14 @@ choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :-
                         computer1_turn(Turn,WhitePlayer,BlackPlayer),!,
                         valid_place_piece_moves(Board,Turn,Moves),
                         random_member(MoveX-MoveY,Moves),
+                        press_any_key_to_continue(ai_place,MoveX,MoveY).
+
+choose_place_piece(Board,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer) :- 
+                        computer2_turn(Turn,WhitePlayer,BlackPlayer),!,
+                        valid_place_piece_moves(Board,Turn,Moves),
+                        setof(Value-MvX-MvY, NewBoard^( member(MvX-MvY, Moves),place_piece(Board,MvX,MvY,NewBoard,Turn),value(place,NewBoard,Turn,Value)),ValueMoves),
+                        last_3_elements(ValueMoves,BestMoves),
+                        random_member(_Value-MoveX-MoveY,BestMoves),
                         press_any_key_to_continue(ai_place,MoveX,MoveY).
 
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
@@ -255,3 +265,20 @@ new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePi
                                                   
 
 new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces,_,_). %no new 3 in a row
+
+
+value(place,Board,Turn,Value) :- turn_number(Turn,TurnNumber),value(place,Board,Board,TurnNumber,0,Value).
+    
+value(place,[],_,_,_,0).
+value(place,[Row|Rows],CompleteBoard,Turn,Y,Result) :-
+    Y1 is Y+1,
+    value(place,Rows,CompleteBoard,Turn,Y1,SubResult),
+    value_row(place,Row,CompleteBoard,Turn,0,Y,RowResult),
+    Result is SubResult + RowResult.
+
+value_row(place,[],_,_,_,_,0).
+value_row(place,[_Elem|Elems],Board,Turn,X,Y,Result) :-
+    X1 is X +1,
+    value_row(place,Elems,Board,Turn,X1,Y,SubResult),
+    get_nr_of_neighbor_diagonal(X,Y,Board,Turn,Nr),
+    Result is SubResult + Nr.

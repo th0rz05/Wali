@@ -103,6 +103,11 @@ value_is(X, Y, Value, List) :-
     nth0(X, Row, Element),
     Element =:= Value.
 
+get_value(X, Y, Value, List) :-
+    nth0(Y, List, Row),
+    nth0(X, Row, Element),
+    Value is Element.
+
 neighbor(X, Y, Board, Value) :-
    X > 0,
    X1 is X - 1,
@@ -120,6 +125,34 @@ neighbor(X, Y, Board, Value) :-
    Y1 is Y + 1,
    value_is(X,Y1,Value,Board).
 
+neighbor_diagonal(X, Y, Board, Value) :- %top left
+   X > 0,
+   Y > 0,
+   X1 is X - 1,
+   Y1 is Y - 1,
+   get_value(X1,Y1,Value,Board).
+neighbor_diagonal(X, Y, Board, Value) :- %top right
+   X < 5,
+   Y > 0,
+   X1 is X + 1,
+   Y1 is Y - 1,
+   get_value(X1,Y1,Value,Board).
+neighbor_diagonal(X, Y, Board, Value) :- %bottom left
+   X > 0,
+   Y < 4,
+   X1 is X - 1,
+   Y1 is Y + 1,
+   get_value(X1,Y1,Value,Board).
+neighbor_diagonal(X, Y, Board, Value) :- %bottom right
+   X < 5,
+   Y < 4,
+   X1 is X + 1,
+   Y1 is Y + 1,
+   get_value(X1,Y1,Value,Board).
+
+get_nr_of_neighbor_diagonal(X,Y,Board,Turn,Number) :-
+    findall(Value, (neighbor_diagonal(X, Y, Board, Value),Value=:=Turn,value_is(X,Y,Turn,Board)), Values),
+    length(Values,Number).
 
 my_sublist(L, M, N, S) :-
     findall(E, (nth0(I, L, E), I >= M, I =< N), S).
@@ -163,3 +196,15 @@ letter_to_number(2,'c').
 letter_to_number(3,'d').
 letter_to_number(4,'e').
 letter_to_number(5,'f').
+
+
+last_3_elements(List, Last3) :-
+    length(List, Length),
+    ( Length < 3 ->
+        Last3 = List
+    ;
+        reverse(List, Reversed),
+        length(Last3, 3),
+        append(Last3, _, Reversed)
+    ).
+     
