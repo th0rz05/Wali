@@ -65,19 +65,19 @@ press_any_key_to_continue(pass) :-
 
 press_any_key_to_continue(ai_place,MoveX,MoveY) :-
     write('Computer will place a piece in '),
-    display_move(MoveX,MoveY),nl,
+    display_move(MoveX,MoveY),nl,nl,
     write('Press ENTER to CONTINUE...'),
     get_char(_).
 
 press_any_key_to_continue(ai_remove,MoveX,MoveY) :-
     write('Computer will remove the piece from '),
-    display_move(MoveX,MoveY),nl,
+    display_move(MoveX,MoveY),nl,nl,
     write('Press ENTER to CONTINUE...'),
     get_char(_).
 
 press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY) :-
     write('Computer will make the move '),
-    display_move(MoveX,MoveY),write(' to '),display_move(NewX,NewY),nl,
+    display_move(MoveX,MoveY),write(' to '),display_move(NewX,NewY),nl,nl,
     write('Press ENTER to CONTINUE...'),
     get_char(_).
 
@@ -187,8 +187,12 @@ computer1_turn(blackturn,_,computer1).
 computer2_turn(whiteturn,computer2,_).
 computer2_turn(blackturn,_,computer2).
 
+computer3_turn(whiteturn,computer3,_).
+computer3_turn(blackturn,_,computer3).
+
 turn_option_into_ai(1,computer1).
 turn_option_into_ai(2,computer2).
+turn_option_into_ai(3,computer3).
 
 letter_to_number(0,'a').
 letter_to_number(1,'b').
@@ -208,3 +212,16 @@ last_X_elements(List,X,LastX) :-
         append(LastX, _, Reversed)
     ).
    
+
+same_value2([_]).
+same_value2([Value1-_-_|T]) :-
+    same_value2(T),
+    T = [Value2-_-_|_],
+    Value1 = Value2.
+
+same_value4([_]).
+same_value4([Value1-_-_-_-_|T]) :-
+    same_value4(T),
+    T = [Value2-_-_-_-_|_],
+    Value1 = Value2.
+

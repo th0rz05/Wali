@@ -110,7 +110,8 @@ display_select_difficulty_menu(white) :-
     write('   |                              Select white AI difficulty                           |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   |                                     1 - EASY                                      |   '),nl,
-    write('   |                                     2 - HARD                                      |   '),nl,
+    write('   |                                     2 - MEDIUM                                    |   '),nl,
+    write('   |                                     3 - HARD                                      |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   *************************************************************************************   '),nl,nl.
 
@@ -120,7 +121,8 @@ display_select_difficulty_menu(black) :-
     write('   |                              Select black AI difficulty                           |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   |                                     1 - EASY                                      |   '),nl,
-    write('   |                                     2 - HARD                                      |   '),nl,
+    write('   |                                     2 - MEDIUM                                    |   '),nl,
+    write('   |                                     3 - HARD                                      |   '),nl,
     write('   |                                                                                   |   '),nl,
     write('   *************************************************************************************   '),nl,nl.
 
