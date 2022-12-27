@@ -4,7 +4,6 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0]],12,12,whiteturn,1).
 
-
 board_size(Board,Width,Height) :-
         length(Board, Height), 
         nth0(0,Board,Row),
@@ -191,9 +190,16 @@ same_value4([Value1-_-_-_-_|T]) :-
     T = [Value2-_-_-_-_|_],
     Value1 = Value2.
 
-same_value_as_last(Elem, Last) :-
+same_value_as_last2(Elem, Last) :-
     Elem = Value-_-_,
     Last = Value-_-_.
 
-get_all_of_high_value(List,Result) :-  
-    findall(Elem, (member(Elem, List), last(List, Last), same_value_as_last(Elem, Last)), Result).
+same_value_as_last4(Elem, Last) :-
+    Elem = Value-_-_-_-_,
+    Last = Value-_-_-_-_.
+
+get_all_of_high_value2(List,Result) :-  
+    findall(Elem, (member(Elem, List), last(List, Last), same_value_as_last2(Elem, Last)), Result).
+
+get_all_of_high_value4(List,Result) :-  
+    findall(Elem, (member(Elem, List), last(List, Last), same_value_as_last4(Elem, Last)), Result).
