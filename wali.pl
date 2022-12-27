@@ -42,7 +42,7 @@ play_game(4,Board,WhitePieces,BlackPieces,Turn,Phase) :-
                         display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
                         game_cycle(Board,WhitePieces,BlackPieces,Turn,Phase,AIWhite,AIBlack).
 
-play_game(4,_,_,_,_,_).
+play_game(0,_,_,_,_,_).
 
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
                         go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
