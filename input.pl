@@ -17,7 +17,7 @@ read_until_between(Min, Max, Value) :- repeat,
                                        read_number(Value),
                                        Value >= Min,
                                        Value =< Max,
-                                       !.
+                                       !,nl.
 
 read_string("") :- peek_code(10),
                    !,
@@ -28,14 +28,14 @@ read_string([Char | T]) :- get_code(Char),
 read_move(X,Y,place) :- print_string("Choose a spot to place the piece(ex:a2): "),
                 read_string(Move),
                 length(Move,2),
-                parse_move(Move,X,Y).
+                parse_move(Move,X,Y),nl.
 
 read_move(X,Y,remove) :- print_string("Choose a spot to remove the piece(ex:a2): "),
                 read_string(Move),
                 length(Move,2),
-                parse_move(Move,X,Y).
+                parse_move(Move,X,Y),nl.
 
 read_move(X,Y,NewX,NewY) :- print_string("Choose a piece and valid move( u(up),d(down),l(left),r(right) -> ex:a2u): "),
                             read_string(Move),
                             length(Move,3),
-                            parse_move(Move,X,Y,NewX,NewY).
+                            parse_move(Move,X,Y,NewX,NewY),nl.

@@ -47,8 +47,8 @@ play_game(4,_,_,_,_,_).
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
                         go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
                         press_any_key_to_continue(phase2),
-                        NewWhitePieces is 4-WhitePieces,
-                        NewBlackPieces is 4-BlackPieces,
+                        NewWhitePieces is 12-WhitePieces,
+                        NewBlackPieces is 12-BlackPieces,
                         display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
                         game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2,WhitePlayer,BlackPlayer).
 
@@ -291,7 +291,7 @@ new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePi
                                                 OldPositions \= NewPositions,
                                                 NewLength >= OldLength,!, %new 3 in a row
                                                 display_game(NewBoard,WhitePieces,BlackPieces,Turn,2),
-                                                print_banner("3 IN A ROW",*, 7),nl,
+                                                display_3_in_a_row,
                                                 choose_remove_piece(NewBoard,Turn,MoveX,MoveY,WhitePlayer,BlackPlayer),
                                                 remove_piece(NewBoard,MoveX,MoveY,BoardAfterRemove),
                                                 deal_with_pieces_after_remove(Turn,WhitePieces,BlackPieces,NewWhitePieces,NewBlackPieces),
@@ -337,31 +337,31 @@ value_row(place,[_Elem|Elems],Board,Turn,X,Y,Result) :-
 
 get_best_place_piece(ValueMoves,_,Value,MoveX,MoveY) :-
             same_value2(ValueMoves),!, %all same value
-            write('same value'),
+            %write('same value'),
             random_member(Value-MoveX-MoveY,ValueMoves).
 
 get_best_place_piece(ValueMoves,NrMoves,Value,MoveX,MoveY) :- % not all same value
             last_X_elements(ValueMoves,NrMoves,BestMoves),
-            write(BestMoves),
+            %write(BestMoves),
             random_member(Value-MoveX-MoveY,BestMoves).
 
 get_best_move_piece(ValueMoves,_,Value,MoveX,MoveY,NewX,NewY) :-
             same_value4(ValueMoves),!, %all same value
-            write('same value'),
+            %write('same value'),
             random_member(Value-MoveX-MoveY-NewX-NewY,ValueMoves).
 
 get_best_move_piece(ValueMoves,NrMoves,Value,MoveX,MoveY,NewX,NewY) :- % not all same value
             last_X_elements(ValueMoves,NrMoves,BestMoves),
-            write(BestMoves),
+            %write(BestMoves),
             random_member(Value-MoveX-MoveY-NewX-NewY,BestMoves).
 
 get_best_remove_piece(ValueMoves,_,Value,MoveX,MoveY) :-
             same_value2(ValueMoves),!, %all same value
-            write('same value'),
+            %write('same value'),
             random_member(Value-MoveX-MoveY,ValueMoves).
 
 get_best_remove_piece(ValueMoves,NrMoves,Value,MoveX,MoveY) :- % not all same value
             last_X_elements(ValueMoves,NrMoves,BestMoves),
-            write(BestMoves),
+            %write(BestMoves),
             random_member(Value-MoveX-MoveY,BestMoves).
 

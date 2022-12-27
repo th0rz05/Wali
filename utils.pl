@@ -2,14 +2,14 @@ initial_state([ [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
                 [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],4,4,whiteturn,1).
+                [0,0,0,0,0,0]],12,12,whiteturn,1).
 
 
-display_piece(0) :- put_code(32).
+board_size(Board,Width,Height) :-
+        length(Board, Height), 
+        nth0(0,Board,Row),
+        length(Row, Width).
 
-display_piece(1) :- put_code(9312).
-
-display_piece(2) :- put_code(10103).
 
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
@@ -52,39 +52,6 @@ parse_move([L|[N|[114|[]]]],X,Y,NewX,NewY) :- X is L-97 ,
                                              NewX is X +1 ,
                                              NewY is Y.
 
-press_any_key_to_continue(phase2) :-
-    print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
-    print_banner("PHASE 2 STARTING",*, 7),nl,nl,nl,
-    write('Press ENTER to continue...'),
-    get_char(_).
-
-press_any_key_to_continue(pass) :-
-    print_banner("NO MOVES POSSIBLE",*, 7),nl,nl,nl,
-    write('Press ENTER to PASS...'),
-    get_char(_).
-
-press_any_key_to_continue(ai_place,MoveX,MoveY) :-
-    write('Computer will place a piece in '),
-    display_move(MoveX,MoveY),nl,nl,
-    write('Press ENTER to CONTINUE...'),
-    get_char(_).
-
-press_any_key_to_continue(ai_remove,MoveX,MoveY) :-
-    write('Computer will remove the piece from '),
-    display_move(MoveX,MoveY),nl,nl,
-    write('Press ENTER to CONTINUE...'),
-    get_char(_).
-
-press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY) :-
-    write('Computer will make the move '),
-    display_move(MoveX,MoveY),write(' to '),display_move(NewX,NewY),nl,nl,
-    write('Press ENTER to CONTINUE...'),
-    get_char(_).
-
-
-congratulate_winner(white) :- print_banner("WINNER!! CONGRATULATIONS WHITE",*, 7),nl,nl.
-
-congratulate_winner(black) :- print_banner("WINNER!! CONGRATULATIONS BLACK",*, 7),nl,nl.
 
 replace(X, Y, Value, List, NewList) :-
     nth0(Y, List, Row),
@@ -194,13 +161,12 @@ turn_option_into_ai(1,computer1).
 turn_option_into_ai(2,computer2).
 turn_option_into_ai(3,computer3).
 
-letter_to_number(0,'a').
-letter_to_number(1,'b').
-letter_to_number(2,'c').
-letter_to_number(3,'d').
-letter_to_number(4,'e').
-letter_to_number(5,'f').
-
+letter_to_number(0,"a").
+letter_to_number(1,"b").
+letter_to_number(2,"c").
+letter_to_number(3,"d").
+letter_to_number(4,"e").
+letter_to_number(5,"f").
 
 last_X_elements(List,X,LastX) :-
     length(List, Length),
@@ -225,3 +191,7 @@ same_value4([Value1-_-_-_-_|T]) :-
     T = [Value2-_-_-_-_|_],
     Value1 = Value2.
 
+
+
+
+    
