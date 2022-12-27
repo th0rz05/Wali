@@ -125,14 +125,15 @@ choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :-
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
                         computer2_turn(Turn,WhitePlayer,BlackPlayer),!,
                         valid_move_piece_moves(Board,Turn,Moves),
-                        setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,NewBoard,Turn,Value)),ValueMoves),
+                        setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,Board,NewBoard,Turn,Value)),ValueMoves),
                         get_best_move_piece(ValueMoves,3,_Value,MoveX,MoveY,NewX,NewY),
                         press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY).
 
 choose_move_piece(Board,Turn,MoveX,MoveY,NewX,NewY,WhitePlayer,BlackPlayer) :- 
                         computer3_turn(Turn,WhitePlayer,BlackPlayer),!,
                         valid_move_piece_moves(Board,Turn,Moves),
-                        setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,NewBoard,Turn,Value)),ValueMoves),
+                        setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,Board,NewBoard,Turn,Value)),ValueMoves),
+                        write(ValueMoves),
                         get_best_move_piece(ValueMoves,1,_Value,MoveX,MoveY,NewX,NewY),
                         press_any_key_to_continue(ai_move,MoveX,MoveY,NewX,NewY).
 
@@ -300,15 +301,21 @@ new_3_in_a_row(Board,NewBoard,Turn,WhitePieces,BlackPieces,FinalBoard,NewWhitePi
 
 new_3_in_a_row(_,NewBoard,_,WhitePieces,BlackPieces,NewBoard,WhitePieces,BlackPieces,_,_). %no new 3 in a row
 
+value(move,Board,NewBoard,Turn,Value) :- 
+                turn_number(Turn,TurnNumber),
+                check_board_for_3_in_a_row(Board,TurnNumber,OldPositions),
+                check_board_for_3_in_a_row(NewBoard,TurnNumber,NewPositions),
+                length(OldPositions,OldLength),
+                length(NewPositions,NewLength),
+                OldPositions \= NewPositions,
+                NewLength >= OldLength,!, %new 3 in a row
+                Value is 1.
+
+value(move,_,_,_,0).   
 
 value(place,Board,Turn,Value) :- 
                 turn_number(Turn,TurnNumber),
                 value(place,Board,Board,TurnNumber,0,Value).
-
-value(move,Board,Turn,Value) :- 
-                turn_number(Turn,TurnNumber),
-                check_board_for_3_in_a_row(Board,TurnNumber,Positions),
-                length(Positions,Value).
 
 value(remove,Board,Turn,NegativeValue) :-
                 switch_turns(Turn,NextTurn),
@@ -317,7 +324,7 @@ value(remove,Board,Turn,NegativeValue) :-
 
 get_opponent_best_move_piece(Board,Turn,Value,MoveX,MoveY,NewX,NewY) :-
             valid_move_piece_moves(Board,Turn,Moves),
-            setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,NewBoard,Turn,Value)),ValueMoves),
+            setof(Value-MvX-MvY-NewX-NewY, NewBoard^( member(MvX-MvY-NewX-NewY, Moves),move_piece(Board,MvX,MvY,NewX,NewY,NewBoard,Turn),value(move,Board,NewBoard,Turn,Value)),ValueMoves),
             last_X_elements(ValueMoves,1,BestMoves),
             random_member(Value-MoveX-MoveY-NewX-NewY,BestMoves).
     

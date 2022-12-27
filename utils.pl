@@ -197,6 +197,3 @@ same_value_as_last(Elem, Last) :-
 
 get_all_of_high_value(List,Result) :-  
     findall(Elem, (member(Elem, List), last(List, Last), same_value_as_last(Elem, Last)), Result).
-
-
-    
