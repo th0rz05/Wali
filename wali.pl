@@ -340,6 +340,11 @@ get_best_place_piece(ValueMoves,_,Value,MoveX,MoveY) :-
             %write('same value'),
             random_member(Value-MoveX-MoveY,ValueMoves).
 
+get_best_place_piece(ValueMoves,1,Value,MoveX,MoveY) :- % get all the top value moves
+            !,get_all_of_high_value(ValueMoves,BestMoves),
+            %write(BestMoves),
+            random_member(Value-MoveX-MoveY,BestMoves).
+
 get_best_place_piece(ValueMoves,NrMoves,Value,MoveX,MoveY) :- % not all same value
             last_X_elements(ValueMoves,NrMoves,BestMoves),
             %write(BestMoves),

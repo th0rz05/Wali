@@ -191,7 +191,12 @@ same_value4([Value1-_-_-_-_|T]) :-
     T = [Value2-_-_-_-_|_],
     Value1 = Value2.
 
+same_value_as_last(Elem, Last) :-
+    Elem = Value-_-_,
+    Last = Value-_-_.
 
+get_all_of_high_value(List,Result) :-  
+    findall(Elem, (member(Elem, List), last(List, Last), same_value_as_last(Elem, Last)), Result).
 
 
     
