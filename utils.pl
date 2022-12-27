@@ -34,6 +34,13 @@ turn_number(blackturn,2).
 turn_option_into_board_size(1,normal).
 turn_option_into_board_size(2,big).
 
+select_board_size(0,1) :- !.
+select_board_size(5,1) :- !.
+select_board_size(_,BoardOption) :- 
+        display_select_board_menu,
+        read_until_between(1,2,BoardOption).
+
+       
 list_append([], L, L).
 list_append([H | T1], L2, [H | T2]) :-
     list_append(T1, L2, T2).

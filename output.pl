@@ -86,6 +86,7 @@ display_start_menu :- draw_menu([
             "2 - PLAYER VS COMPUTER   ",
             "3 - COMPUTER VS PLAYER   ",
             "4 - COMPUTER VS COMPUTER ",
+            "5 - INSTRUCTIONS         ",
             "0 - EXIT                 ",
             " ",
             " "
@@ -114,7 +115,7 @@ display_select_difficulty_menu(white) :-draw_menu([
             " "
             ],85),nl.
 
-display_select_difficulty_menu(black) :-draw_menu([ 
+display_select_difficulty_menu(black) :- draw_menu([ 
             " ",
             " ",
             "Select black AI difficulty ",
@@ -126,6 +127,25 @@ display_select_difficulty_menu(black) :-draw_menu([
             " "
             ],85),nl.
 
+display_instructions :- draw_menu([ 
+            " ",
+            "INSTRUCTIONS ",
+            " ",
+            "The original game is played on a 5x6 square board with 12 stones per player but",
+            "you can play the giant version with a 8x9 board with 22 stones per player.     ",
+            " ",
+            "In PHASE1, players take turns dropping their stones onto the board in spots not",
+            "orthogonaly adjacent to friendly stones trying to place them strategically.    ",
+            " ",
+            "In PHASE2, players take turns moving their stones to adjacent empty spaces on  ",
+            "the board, trying to create exactly 3 pieces in a row (horizontal or vertical) ",
+            "to capture their opponent's stones.                                            ",
+            " ",
+            "The winner is the person who leaves their opponent with 2 or less stones.      ",
+            " ",
+            "0 - EXIT ",
+            " "
+            ],85),nl.
 
 display_game(Board,WhitePieces,BlackPieces,Turn,Phase) :-
     display_phase(Phase),
