@@ -1,20 +1,38 @@
-initial_state([ [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0],
-                [0,0,0,0,0,0]],12,12,whiteturn,1).
+initial_state(normal,[   [0,0,0,0,0,0],
+                        [0,0,0,0,0,0],
+                        [0,0,0,0,0,0],
+                        [0,0,0,0,0,0],
+                        [0,0,0,0,0,0]],12,12,whiteturn,1).
+
+initial_state(big,[ [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0]],22,22,whiteturn,1).
 
 board_size(Board,Width,Height) :-
         length(Board, Height), 
         nth0(0,Board,Row),
         length(Row, Width).
 
+get_original_pieces(Board,Pieces) :-
+    board_size(Board,Width,_Height),
+    Width =:= 6,!,
+    Pieces is 12.
+
+get_original_pieces(_,22).
 
 switch_turns(whiteturn,blackturn).
 switch_turns(blackturn,whiteturn).
 
 turn_number(whiteturn,1).
 turn_number(blackturn,2).
+
+turn_option_into_board_size(1,normal).
+turn_option_into_board_size(2,big).
 
 list_append([], L, L).
 list_append([H | T1], L2, [H | T2]) :-
@@ -75,46 +93,63 @@ get_value(X, Y, Value, List) :-
     Value is Element.
 
 neighbor(X, Y, Board, Value) :-
-   X > 0,
-   X1 is X - 1,
-   value_is(X1,Y,Value,Board).
+    X > 0,
+    X1 is X - 1,
+    value_is(X1,Y,Value,Board).
+
 neighbor(X, Y, Board, Value) :-
-   X < 5,
-   X1 is X+1,
-   value_is(X1,Y,Value,Board).
+    board_size(Board,Width,_Height),
+    NewWidth is Width - 1,
+    X < NewWidth,
+    X1 is X+1,
+    value_is(X1,Y,Value,Board).
+
 neighbor(X, Y, Board, Value) :-
-   Y > 0,
-   Y1 is Y - 1,
-   value_is(X,Y1,Value,Board).
+    Y > 0,
+    Y1 is Y - 1,
+    value_is(X,Y1,Value,Board).
+
 neighbor(X, Y, Board, Value) :-
-   Y < 4,
-   Y1 is Y + 1,
-   value_is(X,Y1,Value,Board).
+    board_size(Board,_Width,Height),
+    NewHeight is Height -1,
+    Y < NewHeight,
+    Y1 is Y + 1,
+    value_is(X,Y1,Value,Board).
 
 neighbor_diagonal(X, Y, Board, Value) :- %top left
-   X > 0,
-   Y > 0,
-   X1 is X - 1,
-   Y1 is Y - 1,
-   get_value(X1,Y1,Value,Board).
+    X > 0,
+    Y > 0,
+    X1 is X - 1,
+    Y1 is Y - 1,
+    get_value(X1,Y1,Value,Board).
+
 neighbor_diagonal(X, Y, Board, Value) :- %top right
-   X < 5,
-   Y > 0,
-   X1 is X + 1,
-   Y1 is Y - 1,
-   get_value(X1,Y1,Value,Board).
+    board_size(Board,Width,_Height),
+    NewWidth is Width - 1,
+    X < NewWidth,
+    Y > 0,
+    X1 is X + 1,
+    Y1 is Y - 1,
+    get_value(X1,Y1,Value,Board).
+
 neighbor_diagonal(X, Y, Board, Value) :- %bottom left
-   X > 0,
-   Y < 4,
-   X1 is X - 1,
-   Y1 is Y + 1,
-   get_value(X1,Y1,Value,Board).
+    board_size(Board,_Width,Height),
+    NewHeight is Height -1,
+    Y < NewHeight,
+    X > 0,
+    X1 is X - 1,
+    Y1 is Y + 1,
+    get_value(X1,Y1,Value,Board).
+
 neighbor_diagonal(X, Y, Board, Value) :- %bottom right
-   X < 5,
-   Y < 4,
-   X1 is X + 1,
-   Y1 is Y + 1,
-   get_value(X1,Y1,Value,Board).
+    board_size(Board,Width,Height),
+    NewWidth is Width - 1,
+    NewHeight is Height -1,
+    X < NewWidth,
+    Y < NewHeight,
+    X1 is X + 1,
+    Y1 is Y + 1,
+    get_value(X1,Y1,Value,Board).
 
 get_nr_of_neighbor_diagonal(X,Y,Board,Turn,Number) :-
     findall(Value, (neighbor_diagonal(X, Y, Board, Value),Value=:=Turn,value_is(X,Y,Turn,Board)), Values),
@@ -166,6 +201,9 @@ letter_to_number(2,"c").
 letter_to_number(3,"d").
 letter_to_number(4,"e").
 letter_to_number(5,"f").
+letter_to_number(6,"g").
+letter_to_number(7,"h").
+letter_to_number(8,"i").
 
 last_X_elements(List,X,LastX) :-
     length(List, Length),

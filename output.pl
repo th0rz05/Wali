@@ -91,6 +91,17 @@ display_start_menu :- draw_menu([
             " "
             ],85),nl.
 
+display_select_board_menu :-draw_menu([ 
+            " ",
+            " ",
+            "Select board size",
+            " ",
+            "1 - NORMAL (6X5) ",
+            "2 - BIG    (9X8) ",
+            " ",
+            " "
+            ],85),nl.
+
 display_select_difficulty_menu(white) :-draw_menu([ 
             " ",
             " ",

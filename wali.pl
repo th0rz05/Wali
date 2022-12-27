@@ -10,9 +10,12 @@
 
 play :-
     display_start_menu,
-    read_until_between(0,4,Option),
-    initial_state(InitialBoard,WhitePieces,BlackPieces,Turn,Phase),
-    play_game(Option,InitialBoard,WhitePieces,BlackPieces,Turn,Phase).
+    read_until_between(0,4,GameOption),
+    display_select_board_menu,
+    read_until_between(1,2,BoardOption),
+    turn_option_into_board_size(BoardOption,Size),
+    initial_state(Size,InitialBoard,WhitePieces,BlackPieces,Turn,Phase),
+    play_game(GameOption,InitialBoard,WhitePieces,BlackPieces,Turn,Phase).
 
 play_game(1,Board,WhitePieces,BlackPieces,Turn,Phase) :- 
                         display_game(Board,WhitePieces,BlackPieces,Turn,Phase),
@@ -47,8 +50,9 @@ play_game(0,_,_,_,_,_).
 game_cycle(Board,WhitePieces,BlackPieces,Turn,1,WhitePlayer,BlackPlayer) :- 
                         go_to_phase2(Board,WhitePieces,BlackPieces,Turn),!,
                         press_any_key_to_continue(phase2),
-                        NewWhitePieces is 12-WhitePieces,
-                        NewBlackPieces is 12-BlackPieces,
+                        get_original_pieces(Board,Original),
+                        NewWhitePieces is Original-WhitePieces,
+                        NewBlackPieces is Original-BlackPieces,
                         display_game(Board,NewWhitePieces,NewBlackPieces,Turn,2),
                         game_cycle(Board,NewWhitePieces,NewBlackPieces,Turn,2,WhitePlayer,BlackPlayer).
 
@@ -174,21 +178,38 @@ valid_move_piece_moves(Board,Turn,Moves):- findall(X-Y-NewX-NewY, validate_move_
 
 valid_remove_piece_moves(Board,Turn,Moves):- findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves).%write(Moves).
 
-validate_place_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), not_occupied(Board,X,Y), no_neighbours(Board,X,Y,Turn). 
+validate_place_piece(Board,X,Y,Turn) :-
+    board_size(Board,Width,Height),
+    NewWidth is Width - 1,
+    NewHeight is Height -1,
+    between(0, NewWidth, X),
+    between(0, NewHeight, Y), 
+    not_occupied(Board,X,Y), 
+    no_neighbours(Board,X,Y,Turn). 
 
-validate_remove_piece(Board,X,Y,Turn) :- between(0, 5, X),between(0, 4, Y), has_enemy(Board,X,Y,Turn). 
+validate_remove_piece(Board,X,Y,Turn) :-
+    board_size(Board,Width,Height),
+    NewWidth is Width - 1,
+    NewHeight is Height -1,
+    between(0, NewWidth, X),
+    between(0, NewHeight, Y), 
+    has_enemy(Board,X,Y,Turn). 
 
-validate_move_piece(Board,X,Y,NewX,NewY,Turn) :- between(0, 5, X),
-                                            between(0, 4, Y),
-                                            has_piece(Board,X,Y,Turn),
-                                            between(0, 5, NewX),
-                                            DiffX is NewX-X,
-                                            between(-1, 1, DiffX),
-                                            between(0, 4, NewY),
-                                            DiffY is NewY-Y,
-                                            between(-1, 1, DiffY),
-                                            (DiffX=:=0;DiffY=:=0),
-                                            not_occupied(Board,NewX,NewY).
+validate_move_piece(Board,X,Y,NewX,NewY,Turn) :- 
+    board_size(Board,Width,Height),
+    NewWidth is Width - 1,
+    NewHeight is Height -1,
+    between(0, NewWidth, X),
+    between(0, NewHeight, Y),
+    has_piece(Board,X,Y,Turn),
+    between(0, NewWidth, NewX),
+    DiffX is NewX-X,
+    between(-1, 1, DiffX),
+    between(0, NewHeight, NewY),
+    DiffY is NewY-Y,
+    between(-1, 1, DiffY),
+    (DiffX=:=0;DiffY=:=0),
+    not_occupied(Board,NewX,NewY).
 
 
 has_piece(Board,X,Y,whiteturn) :- value_is(X, Y, 1, Board).
@@ -239,8 +260,6 @@ pass_place_piece(_,_,0,blackturn).
 
 %sem moves
 pass_place_piece(Board,_,_,Turn) :- no_turn_place_piece_moves(Board,Turn).
-
-
 
 
 three_in_a_row(Nr,[Nr,Nr,Nr,Dif|[]]) :- Nr \= Dif.
