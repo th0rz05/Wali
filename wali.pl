@@ -9,7 +9,7 @@
 :- use_module(library(random)).
 
 % play
-% Description : Starts the wali game
+% Description : starts the wali game
 play :-
     display_start_menu,
     read_until_between(0,5,GameOption),
@@ -126,7 +126,7 @@ game_over(_,_,2,white).
 choose_place_piece(Board,Turn,WhitePlayer,BlackPlayer,MoveX,MoveY) :- 
                         human_turn(Turn,WhitePlayer,BlackPlayer),!,
                         repeat,
-                        read_move(MoveX,MoveY,place),
+                        read_move(place,MoveX,MoveY),
                         validate_place_piece(Board,MoveX,MoveY,Turn),!.
 
 choose_place_piece(Board,Turn,WhitePlayer,BlackPlayer,MoveX,MoveY) :- 
@@ -196,7 +196,7 @@ choose_move_piece(Board,Turn,WhitePlayer,BlackPlayer,MoveX,MoveY,NewX,NewY) :-
 choose_remove_piece(Board,Turn,WhitePlayer,BlackPlayer,MoveX,MoveY) :- 
                         human_turn(Turn,WhitePlayer,BlackPlayer),!,
                         repeat,
-                        read_move(MoveX,MoveY,remove),
+                        read_move(remove,MoveX,MoveY),
                         validate_remove_piece(Board,MoveX,MoveY,Turn),!.
 
 choose_remove_piece(Board,Turn,WhitePlayer,BlackPlayer,MoveX,MoveY) :- 
