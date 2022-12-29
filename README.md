@@ -218,11 +218,13 @@ This predicates use the findall predicate to find all the moves that are valid.
 
 ```prolog
 
-findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves)
-findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves)
-findall(X-Y, validate_move_piece(Board,X,Y,Turn), Moves)
+findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves).
+findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves).
+findall(X-Y, validate_move_piece(Board,X,Y,Turn), Moves).
 
 ```
+
+</div>
 
 Then the Moves list will have the moves on the form of X-Y or X-Y-NewX-NewY.
 
