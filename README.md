@@ -7,7 +7,16 @@
 
 ## Installation and Execution
 
-Provide the necessary instructions for installing and running the game on Linux and Windows environments, including any dependencies or prerequisites (such as installing SICStus Prolog 4.7.1).
+### Requisites
+
+- SICStus Prolog 4.7.1
+
+### Execution
+
+- Go into the /src folder
+- Open SICStus Prolog in command line or in the console;
+- Run `compile('wali.pl').` to compile the game app or in console File -> Compile -> wali.pl;
+- Run `play.` to start the game.
 
 ## Description of Wali
 
