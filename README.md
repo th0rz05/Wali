@@ -41,7 +41,7 @@ To represent our game we need a way to represent the board , the number of piece
 
 - The 5x6 or 8x9 board is represented as 2d list with numbers where 0 represents empty cell, 1 represents white pieces and 2 represents black pieces.
 
-- The number of pieces for each player is represented with a simple number. In phase 1 this number represent the number of pieces in the reserve and in phase 2 represents the number of pieces on the board.
+- The number of pieces for each player is represented with a simple number. In phase 1 this number represents the number of pieces in the reserve and in phase 2 represents the number of pieces on the board.
 
 - The current turn is represented with `whiteturn` or `blackturn`
 
@@ -196,7 +196,13 @@ To validate input for the moves we use the `read_move/3` and `read_move/4` predi
 
 ### Moves Execution
 
-- Move execution: describe the validation and execution of a move, obtaining the new game state. The predicate should be called `move(+GameState, +Move, -NewGameState)`.
+To obtain the move from the user as we above explained we use the `parse_move/3` and `parse_move/5` to transform inputs with the format < letter >< number > into and X and Y position and inputs < letter >< number >< [u-d-l-r] > into X, Y, NewX and NewY (Ex: a2 -> X=0 ; Y=1 and b3d -> X=1 ; Y=2 ;NewX=1 ; Y=3 ). If the above formats are not respected then the predicate fails.
+
+If the predicate succeeds , then we call `validate_place_piece/4`, `validate_remove_piece/4` or `validate_move_piece/6` depending on the type of move. This predicates will see if the X and Y positions are inside the board and verify if the move respects the game rules by using predicates like `not_occupied/3` and `no_neighbours/4` for placing pieces, `has_enemy/4` for removing pieces and `has_piece/4` and `not_occupied/3` for moving pieces.
+
+If the above predicates succeed then the move is valid and we can call `place_piece/5` , `remove_piece/5` or `move_piece/7` depending on the type of move. This predicate will take the current board and the parsed move in the form of X and Y positions and return a new board after the move.
+
+[Note: We did not follow the conventional `move` name because our game has various type of moves and by addopting different names we improved the code readability]
 
 ### List of Valid Moves
 
