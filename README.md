@@ -21,7 +21,7 @@ Provide the necessary instructions for installing and running the game on Linux 
 - This continues until all stones have been placed on the board, or until no more stones can be legally dropped.
 - After all pieces are placed, players take turns moving their own pieces to empty adjacent spaces on the board
 - If a player forms an exact vertical or horizontal 3 in a row with his pieces, he may capture one enemy piece
-- The player who captures all enemy pieces until there are only 2 left, leaving the oponent with no chance to make 3 in row, wins the game.
+- The player who captures all enemy pieces until there are only 2 left, leaving the opponent with no chance to make 3 in row, wins the game.
 
 You can check more in:
 
@@ -202,7 +202,7 @@ If the predicate succeeds , then we call `validate_place_piece/4`, `validate_rem
 
 If the above predicates succeed then the move is valid and we can call `place_piece/5` , `remove_piece/5` or `move_piece/7` depending on the type of move. This predicate will take the current board and the parsed move in the form of X and Y positions and return a new board after the move.
 
-[Note: We did not follow the conventional `move` name because our game has various type of moves and by addopting different names we improved the code readability]
+[Note: We did not follow the conventional `move` name because our game has various type of moves and by adopting different names we improved the code readability]
 
 After the move if the move is a `place_piece` move we need to verify with `go_to_phase2/4` if there are no more valid moves and therefore move to phase 2 or with `pass_place_piece/4` if there are still valid moves but not for the current player so he must pass.
 
@@ -212,7 +212,7 @@ If the move is a `move_piece` move, after the move we need to verify if a new 3 
 
 To obtain a list of the valid moves in any point of the game we use the predicates `valid_place_piece_moves/3`, `valid_remove_piece_moves/3` or `valid_move_piece_moves/3` depending on the type of move.
 
-This predicates use the findall predicate to find all the moves that are valid.
+These predicates use the findall predicate to find all the moves that are valid.
 
 <div style="display: block;  width: 60%; text-align: left">
 
@@ -253,7 +253,7 @@ With our algorithm the removal of e3 or f4 will have the best value (1) because 
 
 We implemented 3 leves of AI in our game representing easy, medium and hard difficulties.
 
-To choose a computer move we use `choose_place_piece/6`, `choose_move_piece/8` or `choose_remove_piece/6` depending on type of move. This predicates use `human_turn/3`, `computer1_turn/3`, `computer2_turn/3` and `computer3_turn/3` to verify what player is going to play. If it a computer of level 1 it gets all the possible moves and returns a random move. If it is a computer of level 2 or 3 , it gets all the possible moves then calculates the value for each move with the predicate setof and then calls `get_best_place_piece/5`, `get_best_move_piece/7` or `get_best_remove_piece/5`. This predicates if it is a level 2 AI select the 3 best moves and then it chooses a random move from this. If it is a level 3 AI it always will play the best move so it gets only the moves with the best value and then selects one. The difference between level 2 and level 3 AI is that level 2 when selecting the top 3 moves there can be moves with different value so it is not guaranteed that the best move will be played while with level 3 it is guaranteed that the move played will have the highest value possible. In any level 2 or level 3 if all the moves have the same value instead of selecting only 3 or 1 we do like in AI level 1 and select a random move because we know that no move is better than other giving the computer a more random behaviour when there is no clear good move.
+To choose a computer move we use `choose_place_piece/6`, `choose_move_piece/8` or `choose_remove_piece/6` depending on type of move. This predicates use `human_turn/3`, `computer1_turn/3`, `computer2_turn/3` and `computer3_turn/3` to verify what player is going to play. If it a computer of level 1 it gets all the possible moves and returns a random move. If it is a computer of level 2 or 3 , it gets all the possible moves then calculates the value for each move with the predicate setof and then calls `get_best_place_piece/5`, `get_best_move_piece/7` or `get_best_remove_piece/5`. These predicates if it is a level 2 AI select the 3 best moves and then it chooses a random move from this. If it is a level 3 AI it will always play the best move so it gets only the moves with the best value and then selects one. The difference between level 2 and level 3 AI is that level 2 when selecting the top 3 moves there can be moves with different value so it is not guaranteed that the best move will be played while with level 3 it is guaranteed that the move played will have the highest value possible. In any level 2 or level 3 if all the moves have the same value instead of selecting only 3 or 1 we do like in AI level 1 and select a random move because we know that no move is better than other giving the computer a more random behaviour when there is no clear good move.
 
 ## Conclusions
 
