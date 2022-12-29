@@ -204,9 +204,27 @@ If the above predicates succeed then the move is valid and we can call `place_pi
 
 [Note: We did not follow the conventional `move` name because our game has various type of moves and by addopting different names we improved the code readability]
 
+After the move if the move is a `place_piece` move we need to verify with `go_to_phase2/4` if there are no more valid moves and therefore move to phase 2 or with `pass_place_piece/4` if there are still valid moves but not for the current player so he must pass.
+
+If the move is a `move_piece` move, after the move we need to verify if a new 3 in a row was made with `new_3_in_a_row/10` that will use `check_board_for_3_in_a_row/3` to verify the 3's in a row in the board before the move and after the move and compare those 3's in a row to see if a new one was made and therefore ask the user to remove an enemy piece.
+
 ### List of Valid Moves
 
-- List of valid moves: describe the obtaining of a list of possible moves. The predicate should be called `valid_moves(+GameState, +Player, -ListOfMoves)`.
+To obtain a list of the valid moves in any point of the game we use the predicates `valid_place_piece_moves/3`, `valid_remove_piece_moves/3` or `valid_move_piece_moves/3` depending on the type of move.
+
+This predicates use the findall predicate to find all the moves that are valid.
+
+<div style="display: block;  width: 60%; text-align: left">
+
+```prolog
+
+findall(X-Y, validate_place_piece(Board,X,Y,Turn), Moves)
+findall(X-Y, validate_remove_piece(Board,X,Y,Turn), Moves)
+findall(X-Y, validate_move_piece(Board,X,Y,Turn), Moves)
+
+```
+
+Then the Moves list will have the moves on the form of X-Y or X-Y-NewX-NewY.
 
 ### End of Game
 
