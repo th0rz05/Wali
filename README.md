@@ -230,24 +230,40 @@ Then the Moves list will have the moves on the form of X-Y or X-Y-NewX-NewY.
 
 ### End of Game
 
-- End of game: describe the verification of the end of the game, with identification of the winner. The predicate should be called `game_over(+GameState, -Winner)`.
+To verify the end of the game we call `game_over/4` that justs verify if any of the player has 2 or less pieces and returns the winner of the game.
 
 ### Board Evaluation
 
-- Board evaluation: describe the method(s) of evaluating the game state. The predicate should be called `value(+GameState, -Value)`.
+To evaluate a specific game state we use `value/4` or `value/5` depending if it the value for placing or removing pieces or the value for moving a piece (this value needs the previous board to be given so it can see if a new 3 in a row was made).
+
+The predicate to get the value of a board for placing pieces simply gives a score to the board based on the number of diagonally connected pieces it has. This is because on the drop phase (phase 1) if we put our pieces diagonally with each other we can make various 3 in a row in phase 2 and therefore win more easily.
+
+The predicate to get the value of a board for moving pieces gives a score to the game state by analyzing if a new 3 in a row was made. If no 3 in a row was made the value will be -1 and if a new 3 in a row was achieved the value will be positive and equal to the number of new 3's in a row made.
+
+The predicate to get the value of a board for removing pieces was the most complex one because in our game this phase is very important because you can prevent 3's in a row from your opponent by removing crucial pieces. Therefore this predicate gives the game state a value corresponding to the negative value of the opponent best move in the next move. Therefore the better the opponent best move in the next turn, the worse that game state is for us. This will make us better value moves that remove pieces that in the next turn would allow the opponent to make a 3 in a row. This predicate is therefore the only one that looks into the future and assumes that the opponent will play the best possible move. To better visualize:
+
+<p align="center">
+  <img src="doc/remove_example.png" width="65%">
+</p>
+
+In this case it is white to move. White may move b1 to c1, making a 3 in-a-row(c1-d1-e1) and remove the black stone at e3 or f4 removing 2 possible 3 in a rows with the move e3 to f3 or f4 to e4.
+With our algorithm the removal of e3 or f4 will have the best value (1) because after it's remove the opponent won't have any 3 in a rows to make so the board will have a value of -1. Because we value the board by the number of new 3's in a row possible, removing e3 or f4 will be better than e2 or f5 because this moves only prevent one 3 in a row and therefore still leave the opponent chance to make a 3 in a row. Still e2 or f5 will be better moves than others that don't remove any 3 in a row.
 
 ### Computer move
 
-- Choice of the move to be performed by the computer, depending on
-the difficulty level. The predicate should be called choose_move(+GameState, +Player,
-+Level, -Move). Level 1 should return a random valid move. Level 2 should return the
-best move at the moment (greedy algorithm), taking into account the evaluation of the
-game state.
+We implemented 3 leves of AI in our game representing easy, medium and hard difficulties.
+
+To choose a computer move we use `choose_place_piece/6`, `choose_move_piece/8` or `choose_remove_piece/6` depending on type of move. This predicates use `human_turn/3`, `computer1_turn/3`, `computer2_turn/3` and `computer3_turn/3` to verify what player is going to play. If it a computer of level 1 it gets all the possible moves and returns a random move. If it is a computer of level 2 or 3 , it gets all the possible moves then calculates the value for each move with the predicate setof and then calls `get_best_place_piece/5`, `get_best_move_piece/7` or `get_best_remove_piece/5`. This predicates if it is a level 2 AI select the 3 best moves and then it chooses a random move from this. If it is a level 3 AI it always will play the best move so it gets only the moves with the best value and then selects one. The difference between level 2 and level 3 AI is that level 2 when selecting the top 3 moves there can be moves with different value so it is not guaranteed that the best move will be played while with level 3 it is guaranteed that the move played will have the highest value possible. In any level 2 or level 3 if all the moves have the same value instead of selecting only 3 or 1 we do like in AI level 1 and select a random move because we know that no move is better than other giving the computer a more random behaviour when there is no clear good move.
 
 ## Conclusions
 
-Reflect on the process of developing the game and discuss any difficulties or learnings acquired during the project. Also, you can include suggestions for potential future improvements.
+In conclusion, it was a little difficult to comprehend Prolog's syntax at first when working on this project. But as we went along and created our first few predicates, we discovered that working with Prolog become lot simpler. Overall, we felt that we cemented the information we had learned in our studies and had a great time working on this project. We appreciated being able to use Prolog to make an entertaining game, and working on this project allowed us to put what we had learned into practice in a meaningful and enjoyable way. We are appreciative of the chance to work on this project despite the early challenges, and we have faith in our capacity to keep learning and developing as Prolog programmers.
+In our program that thing that we feel can be improved is that when a clear winning move is not available the computer will play random because all moves will have the same value. For example if a new 3 in a row is not possible the computer plays random. This could be improved by changing our algorithm to value moves that move pieces that in 2 moves will make a 3 in row. This would require seeing a lot into the future and a lot of processing power but we think we could implement something like chess game engines that analyze the game with a lot of depth to discover the best moves.
 
 ## Bibliography
 
- Listing of books, articles, Web pages and other resources used during the development
+- [Wali](https://www.di.fc.ul.pt/~jpn/gv/wali.htm)
+- [BoardGameGeek](https://boardgamegeek.com/boardgame/66351/wali)
+- [Wikipedia](https://en.wikipedia.org/wiki/Wali_(game))
+- [Moodle](https://moodle.up.pt/course/view.php?id=1997)
+- [Sicstus](https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/)
