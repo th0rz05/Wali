@@ -10,6 +10,34 @@
 ### Requisites
 
 - SICStus Prolog 4.7.1
+- SF Mono Regular font
+
+To guarantee a good performance of the game you should execute it with a white background and the SF Mono Regular font with size 11. This will allow you to see the special characters that are used to represent the pieces.
+
+If you can't change the background to white or can't use that font , please use the Lucidas Console Normal size 12 font and go to the `output.pl` module and comment the following lines:
+
+- [output.pl line 240](./src/output.pl#L240)
+- [output.pl line 243](./src/output.pl#L243)
+
+And uncomment the lines :
+
+- [output.pl line 241](./src/output.pl#L240)
+- [output.pl line 244](./src/output.pl#L243)
+
+After this the code should be:
+
+```prolog
+%display_piece(1) :- write('  '),put_code(0x25CE),write('  ').
+display_piece(1) :- write('  '),put_code(79),write('  ').
+
+%display_piece(2) :- write('  '),put_code(0x25C9),write('  ').
+display_piece(2) :- write('  '),put_code(88),write('  ').
+
+```
+
+This will represent white pieces as O and black pieces as X.
+
+[Note:  We did not make this representation the default because we think the representation with SF Mono font is much more aesthetically pleasing even though we know that the representation with X and O is supported by more fonts.]
 
 ### Execution
 

@@ -238,8 +238,10 @@ display_nr_pieces(WhitePieces,BlackPieces) :-
 display_piece(0) :- write('     ').
 
 display_piece(1) :- write('  '),put_code(0x25CE),write('  ').
+%display_piece(1) :- write('  '),put_code(79),write('  ').
 
 display_piece(2) :- write('  '),put_code(0x25C9),write('  ').
+%display_piece(2) :- write('  '),put_code(88),write('  ').
 
 % display_letters(+Width)
 % +Width -> Width of the board
