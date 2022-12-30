@@ -1,5 +1,5 @@
 %consult('/Users/tiagobarbosa05/Documents/Wali_PFL_FEUP/src/wali.pl').
-%consult('/Users/guilhermealmeida/FEUP - MIEIC/3ºano/PFL/Wali_PFL_FEUP/wali.pl').
+%consult('/Users/guilhermealmeida/FEUP - MIEIC/3ºano/PFL/Wali_PFL_FEUP/src/wali.pl').
 
 :- [utils].
 :- [output].
