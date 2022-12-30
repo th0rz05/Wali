@@ -10,11 +10,11 @@
 ### Requisites
 
 - SICStus Prolog 4.7.1
-- SF Mono Regular font
+- SF Mono Regular font ( [Linux](https://www.securitronlinux.com/debian-testing/install-mac-osx-fonts-on-linux-easily/), [Windows](https://www.cufonfonts.com/font/sf-mono) )
 
 To guarantee a good performance of the game you should execute it with a white background and the SF Mono Regular font with size 11. This will allow you to see the special characters that are used to represent the pieces.
 
-If you can't change the background to white or can't use that font , please use the Lucidas Console Normal size 12 font and go to the `output.pl` module and comment the following lines:
+If you can't change the background to white , can't use that font or have any problems displaying the pieces of the game, please use the Lucida Console Normal size 12 font and go to the `output.pl` module and comment the following lines:
 
 - [output.pl line 240](./src/output.pl#L240)
 - [output.pl line 243](./src/output.pl#L243)
