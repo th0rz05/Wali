@@ -304,3 +304,50 @@ In our program that thing that we feel can be improved is that when a clear winn
 - [Wikipedia](https://en.wikipedia.org/wiki/Wali_(game))
 - [Moodle](https://moodle.up.pt/course/view.php?id=1997)
 - [Sicstus](https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/)
+
+## Examples for Demo
+
+- (PHASE1) There are no moves for white, but there are still moves for black so white must pass.
+
+```prolog
+display_game([[2,0,1,0,2,1],
+              [1,2,0,2,1,2],
+              [2,0,1,0,2,1],
+              [1,2,0,0,1,0],
+              [2,0,1,0,0,1]],2,3,blackturn,1),
+game_cycle([  [2,0,1,0,2,1],
+              [1,2,0,2,1,2],
+              [2,0,1,0,2,1],
+              [1,2,0,0,1,0],
+              [2,0,1,0,0,1]],2,3,blackturn,1,human,human).
+```
+
+- (PHASE2) There is a 3 in row for the computer and he will remove the piece that would allow a 3 in row for the opponent in the next turn.
+
+```prolog
+display_game([[1,1,0,1,1,0],
+              [2,0,1,2,2,0],
+              [1,2,0,0,2,0],
+              [0,0,0,1,0,2],
+              [0,2,0,0,1,2]],8,8,whiteturn,2),
+game_cycle([  [1,1,0,1,1,0],
+              [2,0,1,2,2,0],
+              [1,2,0,0,2,0],
+              [0,0,0,1,0,2],
+              [0,2,0,0,1,2]],8,8,whiteturn,2,computer3,human).
+```
+
+- End of game.
+
+```prolog
+display_game([[1,1,0,0,0,0],
+              [0,0,1,1,0,0],
+              [0,2,0,1,2,0],
+              [0,0,0,0,0,2],
+              [0,0,0,0,0,2]],5,4,whiteturn,2),
+game_cycle([  [1,1,0,0,0,0],
+              [0,0,1,1,0,0],
+              [0,2,0,1,2,0],
+              [0,0,0,0,0,2],
+              [0,0,0,0,0,2]],5,4,whiteturn,2,computer3,human).
+```
