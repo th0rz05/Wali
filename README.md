@@ -1,6 +1,6 @@
-# Wali Board Game
+# Wali
 
-## Wali_1
+Welcome to Wali, a game developed for the [Functional and Logic Programming Curricular Unit](https://sigarra.up.pt/feup/en/UCURR_GERAL.FICHA_UC_VIEW?pv_ocorrencia_id=501686) at FEUP.
 
 - Guilherme Cunha Seco Fernandes de Almeida (up202008866) - 50%
 - Tiago Filipe Magalhães Barbosa (up202004926) - 50%
