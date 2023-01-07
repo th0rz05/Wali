@@ -5,6 +5,9 @@ Welcome to Wali, a game developed for the [Functional and Logic Programming Curr
 - Guilherme Cunha Seco Fernandes de Almeida (up202008866) - 50%
 - Tiago Filipe Magalhães Barbosa (up202004926) - 50%
 
+### Video
+[![Yt video](http://img.youtube.com/vi/OMTKPAp1I/0.jpg)](https://www.youtube.com/watch?v=OMTKPAp1I "FEUP LBAW 2023 - Wali")
+
 ## Installation and Execution
 
 ### Requisites
